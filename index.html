@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProspAIrity Consulting | Experience + Intelligence = Growth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-blue: #0C3D52;
+            --midnight-blue: #073042;
+            --sunset-orange: #FF9A55;
+            --peach-sunrise: #FFC178;
+            --aqua-intel: #23B5D3;
+            --horizon-blue: #3BB1D8;
+            --off-white: #F4FAFD;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            color: var(--midnight-blue);
+            background-color: #fff;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, h4, .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .bg-gradient-sunrise {
+            background: linear-gradient(135deg, var(--sunset-orange), var(--peach-sunrise));
+        }
+
+        .bg-deep-blue { background-color: var(--deep-blue); }
+        .text-deep-blue { color: var(--deep-blue); }
+        .text-aqua { color: var(--aqua-intel); }
+
+        .btn-primary {
+            background-color: var(--sunset-orange);
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px 0 rgba(255, 154, 85, 0.39);
+        }
+
+        .btn-primary:hover {
+            background-color: #e88944;
+            transform: translateY(-2px);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--aqua-intel);
+            transition: width 0.3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .hero-gradient {
+            background: radial-gradient(circle at top right, rgba(255, 193, 120, 0.1), transparent),
+                        radial-gradient(circle at bottom left, rgba(35, 181, 211, 0.05), transparent),
+                        linear-gradient(180deg, #F4FAFD 0%, #FFFFFF 100%);
+        }
+        
+        .logo-container {
+            filter: drop-shadow(0 20px 30px rgba(12, 61, 82, 0.1));
+        }
+
+        .profile-image-container {
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+        }
+
+        .agent-row {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .agent-row:hover {
+            transform: translateX(10px);
+            background-color: white;
+            box-shadow: 0 10px 30px -10px rgba(12, 61, 82, 0.1);
+            border-color: var(--aqua-intel);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-24 items-center">
+                <div class="flex items-center">
+                    <!-- Logo increased to 150% size -->
+                    <img src="logo-full.png" alt="ProspAIrity Consulting" class="h-20 w-auto" onerror="this.src='https://via.placeholder.com/300x90?text=ProspAIrity+Consulting';">
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#problem" class="nav-link font-bold text-xs uppercase tracking-widest text-deep-blue">The Problem</a>
+                    <a href="#services" class="nav-link font-bold text-xs uppercase tracking-widest text-deep-blue">AI Agents</a>
+                    <a href="#pricing" class="nav-link font-bold text-xs uppercase tracking-widest text-deep-blue">Bundles</a>
+                    <a href="#about" class="nav-link font-bold text-xs uppercase tracking-widest text-deep-blue">Founder</a>
+                    <a href="#contact" class="btn-primary px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest">Free Assessment</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-40 pb-24 hero-gradient overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-5/12 space-y-8 text-center lg:text-left">
+                    <div class="inline-block px-4 py-1.5 bg-blue-50 rounded-full border border-blue-100">
+                        <span class="text-[10px] font-black tracking-[0.2em] uppercase text-aqua">San Diego's Premier SMB AI Partner</span>
+                    </div>
+                    <h1 class="text-5xl lg:text-6xl font-montserrat font-bold text-deep-blue leading-tight">
+                        Stop Drowning in <span class="italic font-light">Busywork.</span> <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-sunrise">Start Growing.</span>
+                    </h1>
+                    <p class="text-xl text-gray-600 leading-relaxed max-w-lg">
+                        We help small and mid-sized businesses prosper by combining <span class="font-bold text-deep-blue">20+ years of operational experience</span> with the power of Artificial Intelligence.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+                        <a href="#contact" class="btn-primary px-10 py-5 rounded-2xl font-bold text-center text-lg shadow-xl">Book Free Assessment</a>
+                        <a href="#services" class="px-10 py-5 border-2 border-deep-blue text-deep-blue rounded-2xl font-bold text-center text-lg hover:bg-deep-blue hover:text-white transition-all">Explore Agents</a>
+                    </div>
+                </div>
+                
+                <!-- Brand Visual Section -->
+                <div class="lg:w-7/12 relative">
+                    <div class="relative w-full max-w-2xl mx-auto">
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-gradient-sunrise opacity-20 blur-[120px] rounded-full"></div>
+                        <div class="relative z-10 bg-white/60 backdrop-blur-2xl p-12 lg:p-20 rounded-[4rem] shadow-2xl border border-white/80 flex flex-col items-center text-center">
+                            <div class="logo-container w-full max-w-[500px] mb-12">
+                                <img src="logo.png" alt="ProspAIrity Consulting Graphic" class="w-full h-auto mx-auto" onerror="this.src='https://via.placeholder.com/600x300?text=ProspAIrity+Graphic';">
+                            </div>
+                            <div class="space-y-6 w-full">
+                                <h3 class="font-montserrat font-bold text-3xl lg:text-5xl text-deep-blue tracking-tight leading-none">
+                                    Experience + Intelligence <span class="text-aqua">= Growth</span>
+                                </h3>
+                                <div class="h-1.5 w-32 bg-gradient-sunrise mx-auto rounded-full"></div>
+                                <p class="text-gray-500 font-medium italic text-xl">
+                                    "Helping San Diego Businesses Prosper Through AI."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section id="problem" class="py-24 bg-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-montserrat font-bold text-deep-blue mb-4">You're Not Failing. You're Just Buried.</h2>
+                <p class="text-gray-500 text-lg">Working 60+ hours but revenue is flat? It's time to fix the operational leaks.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 text-left">
+                <div class="p-8 border-l-4 border-sunset-orange bg-off-white rounded-r-3xl">
+                    <p class="font-bold text-deep-blue mb-3 text-xl font-montserrat">The 60-Hour Trap</p>
+                    <p class="text-gray-600 leading-relaxed text-sm">Trading all your personal time for administrative survival—answering FAQs, chasing invoices, and updating spreadsheets manually.</p>
+                </div>
+                <div class="p-8 border-l-4 border-aqua-intel bg-off-white rounded-r-3xl">
+                    <p class="font-bold text-deep-blue mb-3 text-xl font-montserrat">Complexity Overload</p>
+                    <p class="text-gray-600 leading-relaxed text-sm">Every "new tool" you've tried just added more friction to your plate. You need a cohesive system that removes work, not adds it.</p>
+                </div>
+                <div class="p-8 border-l-4 border-deep-blue bg-off-white rounded-r-3xl">
+                    <p class="font-bold text-deep-blue mb-3 text-xl font-montserrat">The Hidden Revenue Leak</p>
+                    <p class="text-gray-600 leading-relaxed text-sm">Missed leads and "I forgot to call them back" moments are costing your business thousands in quiet revenue loss every month.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Agent Suite Section (Vertical 5 Rows) -->
+    <section id="services" class="py-24 bg-off-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-montserrat font-bold text-deep-blue mb-4">Your New Digital Staff</h2>
+                <p class="text-gray-600 text-lg">Specialized AI Agents built to handle your highest-friction tasks.</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Row 1: Communication -->
+                <div class="agent-row bg-white/50 p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-20 h-20 bg-blue-50 rounded-3xl flex-shrink-0 flex items-center justify-center text-4xl">💬</div>
+                    <div class="flex-grow text-center md:text-left">
+                        <h3 class="text-2xl font-bold text-deep-blue mb-2 font-montserrat">Communication Agent</h3>
+                        <p class="text-gray-600 leading-relaxed">Captures leads instantly via SMS and email. Qualifies prospects at 2 AM so you wake up to a booked calendar.</p>
+                    </div>
+                    <div class="text-center md:text-right flex-shrink-0">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-aqua bg-blue-50 px-4 py-2 rounded-full">Reclaims 10 hrs/week</span>
+                    </div>
+                </div>
+
+                <!-- Row 2: Workflow -->
+                <div class="agent-row bg-white/50 p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-20 h-20 bg-orange-50 rounded-3xl flex-shrink-0 flex items-center justify-center text-4xl">⚙️</div>
+                    <div class="flex-grow text-center md:text-left">
+                        <h3 class="text-2xl font-bold text-deep-blue mb-2 font-montserrat">Workflow Agent</h3>
+                        <p class="text-gray-600 leading-relaxed">The "Glue" of your business. Generates documents, syncs CRM data, and triggers invoices automatically upon job completion.</p>
+                    </div>
+                    <div class="text-center md:text-right flex-shrink-0">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-sunset-orange bg-orange-50 px-4 py-2 rounded-full">Saves 15 hrs/week</span>
+                    </div>
+                </div>
+
+                <!-- Row 3: Knowledge -->
+                <div class="agent-row bg-white/50 p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-20 h-20 bg-purple-50 rounded-3xl flex-shrink-0 flex items-center justify-center text-4xl">🧠</div>
+                    <div class="flex-grow text-center md:text-left">
+                        <h3 class="text-2xl font-bold text-deep-blue mb-2 font-montserrat">Knowledge Agent</h3>
+                        <p class="text-gray-600 leading-relaxed">Your business brain. Instantly recalls customer history, internal SOPs, and technical specs for your field team.</p>
+                    </div>
+                    <div class="text-center md:text-right flex-shrink-0">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-purple-600 bg-purple-50 px-4 py-2 rounded-full">Zero Search Time</span>
+                    </div>
+                </div>
+
+                <!-- Row 4: Action -->
+                <div class="agent-row bg-white/50 p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-20 h-20 bg-green-50 rounded-3xl flex-shrink-0 flex items-center justify-center text-4xl">⚡</div>
+                    <div class="flex-grow text-center md:text-left">
+                        <h3 class="text-2xl font-bold text-deep-blue mb-2 font-montserrat">Action Agent</h3>
+                        <p class="text-gray-600 leading-relaxed">The Doer. Executes complex sequences—booking shipping, updating inventory, and sending personalized chasers.</p>
+                    </div>
+                    <div class="text-center md:text-right flex-shrink-0">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-4 py-2 rounded-full">Scale Without Hiring</span>
+                    </div>
+                </div>
+
+                <!-- Row 5: Research -->
+                <div class="agent-row bg-white/50 p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-20 h-20 bg-red-50 rounded-3xl flex-shrink-0 flex items-center justify-center text-4xl">🔍</div>
+                    <div class="flex-grow text-center md:text-left">
+                        <h3 class="text-2xl font-bold text-deep-blue mb-2 font-montserrat">Research Agent</h3>
+                        <p class="text-gray-600 leading-relaxed">Your data scout. Analyzes market trends, monitors competitor pricing, and summarizes technical reports in seconds.</p>
+                    </div>
+                    <div class="text-center md:text-right flex-shrink-0">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-red-600 bg-red-50 px-4 py-2 rounded-full">Pure Intelligence</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Bundles Section -->
+    <section id="pricing" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-montserrat font-bold text-deep-blue mb-4">Investment Bundles</h2>
+                <p class="text-gray-600 max-w-xl mx-auto">Scalable solutions designed for immediate ROI and operational clarity.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Bundle 1 -->
+                <div class="p-10 bg-off-white rounded-[3rem] border border-gray-100 flex flex-col h-full hover:shadow-2xl transition-all">
+                    <div class="mb-8">
+                        <h4 class="font-bold text-xl text-deep-blue mb-2 font-montserrat">AI Essentials Setup</h4>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-5xl font-bold text-deep-blue">$750</span>
+                        </div>
+                        <p class="text-gray-500 text-xs mt-3 font-bold uppercase tracking-wider">Perfect for Solo & Micro Teams</p>
+                    </div>
+                    <ul class="space-y-4 mb-12 flex-grow">
+                        <li class="flex items-start gap-3 text-sm text-gray-600 font-medium">✓ Communication Agent (Basic)</li>
+                        <li class="flex items-start gap-3 text-sm text-gray-600 font-medium">✓ CRM Entry Automation</li>
+                        <li class="flex items-start gap-3 text-sm text-gray-600 font-medium">✓ Lead Alert System</li>
+                        <li class="flex items-start gap-3 text-sm text-gray-600 font-medium">✓ Implementation Support</li>
+                    </ul>
+                    <div class="pt-6 border-t border-gray-200">
+                        <p class="text-[10px] font-black text-deep-blue uppercase tracking-widest mb-2">EXPECTED RESULT</p>
+                        <p class="font-bold text-deep-blue text-sm">Reclaims 5-8 Hours Weekly</p>
+                    </div>
+                </div>
+
+                <!-- Bundle 2 -->
+                <div class="p-10 bg-deep-blue text-white rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col h-full transform scale-105 z-10">
+                    <div class="absolute top-6 right-6 bg-sunset-orange text-[10px] font-black px-4 py-1.5 rounded-full">MOST POPULAR</div>
+                    <div class="mb-8">
+                        <h4 class="font-bold text-xl text-aqua mb-2 font-montserrat">AI Growth Engine</h4>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-5xl font-bold">$1,500</span>
+                        </div>
+                        <p class="text-gray-300 text-xs mt-3 font-bold uppercase tracking-wider">The Standard for SMB Growth</p>
+                    </div>
+                    <ul class="space-y-4 mb-12 flex-grow">
+                        <li class="flex items-start gap-3 text-sm text-gray-100 font-medium">✓ 2-3 Custom Multi-Step Agents</li>
+                        <li class="flex items-start gap-3 text-sm text-gray-100 font-medium">✓ Automated Lead Nurturing</li>
+                        <li class="flex items-start gap-3 text-sm text-gray-100 font-medium">✓ Invoicing & Payment Automation</li>
+                        <li class="flex items-start gap-3 text-sm text-gray-100 font-medium">✓ Marketing Content Engine</li>
+                    </ul>
+                    <div class="pt-6 border-t border-white/10">
+                        <p class="text-[10px] font-black text-aqua uppercase tracking-widest mb-2">EXPECTED RESULT</p>
+                        <p class="font-bold text-sm text-white">12-18 Hours Reclaimed Weekly + 30% Lead Conversion Boost</p>
+                    </div>
+                </div>
+
+                <!-- Bundle 3 -->
+                <div class="p-10 bg-off-white rounded-[3rem] border border-gray-100 flex flex-col h-full hover:shadow-2xl transition-all">
+                    <div class="mb-8">
+                        <h4 class="font-bold text-xl text-deep-blue mb-2 font-montserrat">AI Transformation</h4>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-5xl font-bold text-deep-blue">$2,500</span>
+                        </div>
+                        <p class="text-gray-500 text-xs mt-3 font-bold uppercase tracking-wider">Full Operational Overhaul</p>
+                    </div>
+                    <ul class="space-y-4 mb-12 flex-grow">
+                        <li class="flex items-start gap-3 text-sm text-gray-600 font-medium">✓ Full Suite of 5+ AI Agents</li>
+                        <li class="flex items-start gap-3 text-sm text-gray-600 font-medium">✓ Advanced CRM Architecting</li>
+                        <li class="flex items-start gap-3 text-sm text-gray-600 font-medium">✓ Knowledge Base Setup</li>
+                        <li class="flex items-start gap-3 text-sm text-gray-600 font-medium">✓ 2 Virtual Training Sessions</li>
+                    </ul>
+                    <div class="pt-6 border-t border-gray-200">
+                        <p class="text-[10px] font-black text-deep-blue uppercase tracking-widest mb-2">EXPECTED RESULT</p>
+                        <p class="font-bold text-deep-blue text-sm">20-30 Hours Reclaimed Weekly + Full Operational Clarity</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section (Founder) -->
+    <section id="about" class="py-24 bg-deep-blue text-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center gap-16 lg:gap-24">
+                <!-- Photo Box (~20-25% of row width) -->
+                <div class="md:w-1/4">
+                    <div class="profile-image-container relative rounded-[2.5rem] overflow-hidden aspect-[4/5] bg-slate-800 border-4 border-white/5">
+                        <img src="greg.jpg" alt="Gregory Klisser" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/600x750?text=Gregory+Klisser';">
+                        <div class="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-deep-blue via-transparent to-transparent">
+                            <p class="font-montserrat font-bold text-xl">Gregory Klisser</p>
+                            <p class="text-aqua font-black uppercase tracking-widest text-[10px]">Founder & Strategist</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:w-3/4 space-y-6">
+                    <h2 class="text-4xl font-montserrat font-bold text-aqua">"We Speak Human, Not Code."</h2>
+                    <div class="space-y-4 text-gray-300 text-lg leading-relaxed">
+                        <p>
+                            With over <span class="text-white font-bold">20 years of experience</span> across healthcare technology, SaaS, and clinical systems, I’ve seen how systems can transform a business—or bury it.
+                        </p>
+                        <p>
+                            Having generated over <span class="text-white font-bold">$60 million in revenue</span> and delivered 75+ national presentations, my focus is now on making enterprise-level AI accessible to San Diego's Main Street businesses. 
+                        </p>
+                        <p>
+                            At ProspAIrity Consulting, we believe AI should support people, not replace them. We combine deep operational expertise with automation to help you reclaim your time and scale your growth.
+                        </p>
+                    </div>
+                    <div class="pt-8 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-1">Languages</p>
+                            <p class="font-bold text-sm">EN, FR, ES</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-1">Track Record</p>
+                            <p class="font-bold text-sm">$60M+ Revenue</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-1">Experience</p>
+                            <p class="font-bold text-sm">20+ Yrs Ops</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-1">Impact</p>
+                            <p class="font-bold text-sm">75+ Nat'l Talk</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="max-w-3xl mx-auto bg-off-white p-10 lg:p-20 rounded-[4rem] border border-gray-100 shadow-sm">
+                <h2 class="text-4xl lg:text-5xl font-montserrat font-bold text-deep-blue mb-6">Start Prospering Today.</h2>
+                <p class="text-xl text-gray-600 mb-12">Book your 30-minute AI Readiness Assessment. Let's find the 20 hours you're losing every week.</p>
+                
+                <form class="space-y-4 max-w-md mx-auto">
+                    <input type="text" placeholder="Full Name" class="w-full px-6 py-5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-aqua outline-none transition-all">
+                    <input type="email" placeholder="Business Email" class="w-full px-6 py-5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-aqua outline-none transition-all">
+                    <button type="submit" class="btn-primary w-full py-5 rounded-2xl font-bold text-lg shadow-xl uppercase tracking-widest mt-2">Request Assessment</button>
+                </form>
+
+                <div class="mt-16 pt-12 border-t border-gray-200 flex flex-wrap justify-center gap-10 text-[10px] font-black text-deep-blue uppercase tracking-widest">
+                    <span>📧 ProspAIrityConsulting@gmail.com</span>
+                    <span>📱 (858) 480-7230</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-white border-t border-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-8">
+            <img src="logo-full.png" alt="ProspAIrity Logo" class="h-12 w-auto">
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">© 2024 ProspAIrity Consulting. San Diego, CA.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
