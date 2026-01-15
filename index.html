@@ -389,15 +389,65 @@
     <!-- Contact Section -->
     <section id="contact" class="py-24 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="max-w-3xl mx-auto bg-off-white p-10 lg:p-20 rounded-[4rem] border border-gray-100 shadow-sm">
-                <h2 class="text-4xl lg:text-5xl font-montserrat font-bold text-deep-blue mb-6">Start Prospering Today.</h2>
-                <p class="text-xl text-gray-600 mb-12">Book your 30-minute AI Readiness Assessment. Let's find the 20 hours you're losing every week.</p>
+            <div class="max-w-3xl mx-auto bg-off-white p-10 lg:p-16 rounded-[4rem] border border-gray-100 shadow-sm overflow-hidden">
                 
-                <form class="space-y-4 max-w-md mx-auto">
-                    <input type="text" placeholder="Full Name" class="w-full px-6 py-5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-aqua outline-none transition-all">
-                    <input type="email" placeholder="Business Email" class="w-full px-6 py-5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-aqua outline-none transition-all">
-                    <button type="submit" class="btn-primary w-full py-5 rounded-2xl font-bold text-lg shadow-xl uppercase tracking-widest mt-2">Request Assessment</button>
-                </form>
+                <!-- Form Content -->
+                <div id="form-container">
+                    <h2 class="text-4xl lg:text-5xl font-montserrat font-bold text-deep-blue mb-6">Start Prospering Today.</h2>
+                    <p class="text-xl text-gray-600 mb-12">Book your 30-minute AI Readiness Assessment. Let's find the 20 hours you're losing every week.</p>
+                    
+                    <form id="contact-form" name="contact" method="POST" data-netlify="true" class="space-y-4 max-w-lg mx-auto text-left">
+                        <!-- Netlify hidden field -->
+                        <input type="hidden" name="form-name" value="contact" />
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" name="name" placeholder="Full Name" required 
+                                class="w-full px-6 py-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-aqua outline-none transition-all">
+                            
+                            <input type="email" name="email" placeholder="Business Email" required 
+                                class="w-full px-6 py-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-aqua outline-none transition-all">
+                        </div>
+
+                        <select name="service" required 
+                            class="w-full px-6 py-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-aqua outline-none transition-all bg-white appearance-none">
+                            <option value="" disabled selected>Select Primary Interest</option>
+                            <option>AI Strategy & Discovery</option>
+                            <option>Operational Automation</option>
+                            <option>Custom AI Integration</option>
+                            <option>General Inquiry</option>
+                        </select>
+
+                        <textarea name="message" placeholder="How can we help you prosper?" rows="3" required 
+                            class="w-full px-6 py-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-aqua outline-none transition-all resize-none"></textarea>
+
+                        <!-- Bot field for Netlify -->
+                        <div class="hidden">
+                            <label>Don’t fill this out: <input name="bot-field" /></label>
+                        </div>
+
+                        <button type="submit" id="submit-btn" class="btn-primary w-full py-5 rounded-2xl font-bold text-lg shadow-xl uppercase tracking-widest mt-2">
+                            Request Assessment
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Success State (Hidden by Default) -->
+                <div id="success-message" class="hidden py-10 fade-in">
+                    <div class="mb-6 flex justify-center">
+                        <div class="bg-green-100 p-4 rounded-full">
+                            <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl lg:text-4xl font-montserrat font-bold text-deep-blue mb-4">Inquiry Received</h2>
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed max-w-md mx-auto">
+                        Thank you for reaching out. Expect a personal response within 24 hours to begin our Discovery Phase.
+                    </p>
+                    <button onclick="resetForm()" class="text-sm font-bold text-aqua uppercase tracking-widest hover:opacity-70 transition">
+                        Send another message
+                    </button>
+                </div>
 
                 <div class="mt-16 pt-12 border-t border-gray-200 flex justify-center gap-10 text-[16px] font-black text-deep-blue uppercase tracking-widest">
                     <span>📧 ProspAIrityConsulting@gmail.com</span>
@@ -415,9 +465,60 @@
         </div>
     </footer>
 
+ <!-- Form Logic -->
+    <script>
+        const contactForm = document.getElementById('contact-form');
+        const formContainer = document.getElementById('form-container');
+        const successMessage = document.getElementById('success-message');
+        const submitBtn = document.getElementById('submit-btn');
+
+        if (contactForm) {
+            contactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Sending...';
+
+                const formData = new FormData(contactForm);
+                
+                try {
+                    // Netlify AJAX submission
+                    await fetch("/", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams(formData).toString(),
+                    });
+                    
+                    // Show success message
+                    formContainer.classList.add('hidden');
+                    successMessage.classList.remove('hidden');
+                    // Scroll to top of section so they see the message
+                    document.getElementById('contact').scrollIntoView();
+                } catch (error) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Request Assessment';
+                    // Custom fallback instead of alert
+                    console.error('Submission error:', error);
+                    const errorBox = document.createElement('div');
+                    errorBox.className = 'mt-4 text-red-500 font-bold';
+                    errorBox.innerText = 'Sorry, there was an error. Please email us directly.';
+                    contactForm.appendChild(errorBox);
+                }
+            });
+        }
+
+        function resetForm() {
+            successMessage.classList.add('hidden');
+            formContainer.classList.remove('hidden');
+            contactForm.reset();
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Request Assessment';
+        }
+    </script>
+    
 </body>
 
 </html>
+
 
 
 
