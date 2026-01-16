@@ -408,6 +408,20 @@
                                 class="w-full px-6 py-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-aqua outline-none transition-all">
                         </div>
 
+                        <div class="input-group">
+                            <label for="phone" class="required">Phone Number</label>
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                name="phone" 
+                                placeholder="(555) 000-0000" 
+                                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}|[0-9]{10}"
+                                title="Please enter a 10-digit phone number"
+                                required
+                             >
+                             <p class="text-xs text-slate-400 mt-1">Format: 123-456-7890</p>
+                        </div>
+                        
                         <select name="service" required 
                             class="w-full px-6 py-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-aqua outline-none transition-all bg-white appearance-none">
                             <option value="" disabled selected>Select Primary Interest</option>
@@ -518,6 +532,7 @@
 </body>
 
 </html>
+
 
 
 
