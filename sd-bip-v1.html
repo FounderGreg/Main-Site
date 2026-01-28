@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- GHOST MODE: Prevents search engines from indexing the tool -->
     <meta name="robots" content="noindex, nofollow">
-    
     <title>ProspAIrity Diagnostic | SD 2026</title>
     
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -21,8 +18,6 @@
         .btn-shadow { box-shadow: 0 4px 14px 0 rgba(255, 154, 85, 0.3); }
         .animate-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Custom scrollbar for results */
         .results-scroll::-webkit-scrollbar { width: 4px; }
         .results-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
         .results-scroll::-webkit-scrollbar-thumb { background: #FF9A55; border-radius: 10px; }
@@ -31,7 +26,6 @@
 <body>
     <div id="root"></div>
 
-    <!-- This hidden form is for Netlify's build-time bot to detect the form fields -->
     <form name="diagnostic-lead" data-netlify="true" hidden>
         <input type="text" name="userName" />
         <input type="text" name="companyName" />
@@ -39,7 +33,10 @@
         <input type="tel" name="userPhone" />
         <input type="text" name="industry" />
         <input type="text" name="employees" />
-        <textarea name="strategic_profile"></textarea>
+        <input type="text" name="exports" />
+        <input type="text" name="investingInTech" />
+        <input type="text" name="trainingNeeded" />
+        <textarea name="diagnostic_summary"></textarea>
     </form>
 
     <script type="text/babel">
@@ -82,30 +79,13 @@
                 const isBaseSector = formData.industry === 'manufacturing' || formData.industry === 'professional' || formData.exports;
                 
                 if (empCount <= 24 && isBaseSector) {
-                    results.push({ 
-                        name: "SD Business Incentive (BIP)", 
-                        value: "Up to $100,000", 
-                        conf: "High", 
-                        desc: "Matches 'Base Sector' profile. We frame your overhaul as 'Innovation Economy' training to satisfy Tier 2-4 requirements." 
-                    });
+                    results.push({ name: "SD Business Incentive (BIP)", value: "Up to $100,000" });
                 }
-
                 if (formData.trainingNeeded) {
-                    results.push({ 
-                        name: "ETP Training Grants", 
-                        value: empCount >= 10 ? "$25,000 - $50,000+" : "$15,000 - $25,000", 
-                        conf: "High", 
-                        desc: "Recover consulting fees via state-subsidized employee upskilling on AI/Automation logic." 
-                    });
+                    results.push({ name: "ETP Training Grants", value: empCount >= 10 ? "$25k-$50k+" : "$15k-$25k" });
                 }
-
                 if (formData.industry === 'manufacturing' || formData.investingInTech) {
-                    results.push({ 
-                        name: "CA Sales Tax Exemption", 
-                        value: "~4.12% Savings", 
-                        conf: "High", 
-                        desc: "Reduces cost of R&D hardware and automation-ready software infrastructure." 
-                    });
+                    results.push({ name: "CA Sales Tax Exemption", value: "~4.12% Savings" });
                 }
                 return results;
             };
@@ -114,11 +94,19 @@
                 e.preventDefault();
                 setIsSubmitting(true);
 
-                const profileSummary = [
-                    formData.exports ? "Exports services" : "",
-                    formData.investingInTech ? "Tech investor" : "",
-                    formData.trainingNeeded ? "Training required" : ""
-                ].filter(Boolean).join(", ");
+                // Create the Summary of what the user actually saw
+                const eligibleItems = calculateEligibility();
+                const summaryString = `
+RESULTS SHOWN TO USER:
+${eligibleItems.map(r => `- ${r.name}: ${r.value}`).join('\n')}
+
+USER SELECTIONS:
+- Industry: ${formData.industry}
+- Employees: ${formData.employees}
+- Exports: ${formData.exports ? 'Yes' : 'No'}
+- Tech Investment: ${formData.investingInTech ? 'Yes' : 'No'}
+- Training Needs: ${formData.trainingNeeded ? 'Yes' : 'No'}
+                `.trim();
 
                 fetch("/", {
                     method: "POST",
@@ -126,7 +114,11 @@
                     body: encode({ 
                         "form-name": "diagnostic-lead", 
                         ...formData,
-                        strategic_profile: profileSummary
+                        // Explicitly converting booleans to strings for Netlify
+                        exports: formData.exports ? "Yes" : "No",
+                        investingInTech: formData.investingInTech ? "Yes" : "No",
+                        trainingNeeded: formData.trainingNeeded ? "Yes" : "No",
+                        diagnostic_summary: summaryString
                     })
                 })
                 .then(() => {
@@ -151,17 +143,15 @@
                         </div>
 
                         <div className="p-8">
-                            {/* Step 0: Welcome */}
                             {step === 0 && (
                                 <div className="text-center space-y-6 animate-in">
                                     <div className="text-5xl mb-2">📈</div>
                                     <h2 className="text-2xl font-bold text-slate-800 tracking-tight leading-tight">Recruit Your Capital</h2>
-                                    <p className="text-slate-600 text-sm leading-relaxed font-medium">Identify regional subsidies to offset your 2026 operational transformation and protect your margins.</p>
+                                    <p className="text-slate-600 text-sm leading-relaxed font-medium">Identify regional subsidies to offset your 2026 operational transformation.</p>
                                     <button onClick={() => setStep(1)} className="w-full bg-[#0C3D52] text-white py-4 rounded-2xl font-bold hover:bg-[#073042] transition-all btn-shadow active:scale-95">Start Assessment</button>
                                 </div>
                             )}
 
-                            {/* Step 1: Industry */}
                             {step === 1 && (
                                 <div className="space-y-4 animate-in">
                                     <h2 className="font-bold text-slate-800 mb-2 uppercase text-xs tracking-widest">1. Select Sector:</h2>
@@ -176,7 +166,6 @@
                                 </div>
                             )}
 
-                            {/* Step 2: Scale */}
                             {step === 2 && (
                                 <div className="space-y-4 animate-in">
                                     <h2 className="font-bold text-slate-800 mb-2 uppercase text-xs tracking-widest">2. Team Scale:</h2>
@@ -189,7 +178,6 @@
                                 </div>
                             )}
 
-                            {/* Step 3: Profile */}
                             {step === 3 && (
                                 <div className="space-y-4 animate-in">
                                     <h2 className="font-bold text-slate-800 uppercase text-xs tracking-widest">3. Strategic Profile:</h2>
@@ -199,81 +187,44 @@
                                     </label>
                                     <label className="flex items-center p-4 border-2 border-slate-50 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors">
                                         <input type="checkbox" onChange={e => setFormData({...formData, investingInTech: e.target.checked})} className="w-5 h-5 rounded border-slate-300 text-[#FF9A55] focus:ring-[#FF9A55] mr-4"/> 
-                                        <span className="text-xs font-semibold text-slate-700 leading-tight">Planning significant tech infrastructure upgrades in 2026.</span>
+                                        <span className="text-xs font-semibold text-slate-700 leading-tight">Planning tech infrastructure upgrades in 2026.</span>
                                     </label>
                                     <label className="flex items-center p-4 border-2 border-slate-50 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors">
                                         <input type="checkbox" onChange={e => setFormData({...formData, trainingNeeded: e.target.checked})} className="w-5 h-5 rounded border-slate-300 text-[#FF9A55] focus:ring-[#FF9A55] mr-4"/> 
-                                        <span className="text-xs font-semibold text-slate-700 leading-tight">Team requires upskilling for new automated logic systems.</span>
+                                        <span className="text-xs font-semibold text-slate-700 leading-tight">Team requires upskilling for new systems.</span>
                                     </label>
                                     <button onClick={() => setStep(4)} className="w-full bg-[#0C3D52] text-white py-5 rounded-2xl font-bold mt-4 btn-shadow active:scale-95 transition-transform uppercase tracking-widest text-xs">Analyze Capital Options</button>
                                 </div>
                             )}
 
-                            {/* Step 4: Final Results & Lead Form */}
                             {step === 4 && (
                                 <div className="space-y-4 animate-in">
                                     <h2 className="font-bold text-slate-800 text-lg border-b pb-1 uppercase tracking-tight">Incentive Targets:</h2>
                                     <div className="space-y-3 max-h-[220px] overflow-y-auto pr-2 results-scroll">
-                                        {results.length > 0 ? results.map((r, idx) => (
-                                            <div key={idx} className="p-4 bg-slate-50 border-l-4 border-[#FF9A55] rounded-r-2xl relative shadow-sm">
-                                                <span className="absolute top-2 right-2 text-[7px] px-2 py-0.5 rounded font-black uppercase bg-green-500 text-white">
-                                                    {r.conf} Prob.
-                                                </span>
+                                        {results.map((r, idx) => (
+                                            <div key={idx} className="p-4 bg-slate-50 border-l-4 border-[#FF9A55] rounded-r-2xl shadow-sm">
                                                 <h4 className="font-bold text-[#0C3D52] text-[10px] mb-1">{r.name}</h4>
                                                 <div className="text-2xl font-black text-slate-900 leading-none mb-1">{r.value}</div>
-                                                <p className="text-[9px] text-slate-500 leading-tight italic font-medium">{r.desc}</p>
                                             </div>
-                                        )) : <p className="text-xs text-slate-500 italic text-center py-4">Standard track confirmed.</p>}
+                                        ))}
                                     </div>
                                     
                                     {!isSubmitted ? (
                                         <form onSubmit={handleSubmit} className="mt-6 space-y-3 p-6 bg-[#073042] rounded-[2rem] shadow-xl">
                                             <h3 className="text-[#FF9A55] text-[11px] font-black uppercase tracking-widest text-center mb-2">Unlock Roadmap</h3>
-                                            <input 
-                                                required 
-                                                name="userName"
-                                                placeholder="Full Name" 
-                                                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-xs placeholder:text-white/40 outline-none focus:border-[#FF9A55] transition-colors"
-                                                onChange={(e) => setFormData({...formData, userName: e.target.value})}
-                                            />
-                                            <input 
-                                                required 
-                                                name="companyName"
-                                                placeholder="Company Name" 
-                                                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-xs placeholder:text-white/40 outline-none focus:border-[#FF9A55] transition-colors"
-                                                onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-                                            />
-                                            <div className="flex gap-2">
-                                                <input 
-                                                    required 
-                                                    name="userEmail"
-                                                    type="email" 
-                                                    placeholder="Work Email" 
-                                                    className="w-1/2 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-xs placeholder:text-white/40 outline-none focus:border-[#FF9A55] transition-colors"
-                                                    onChange={(e) => setFormData({...formData, userEmail: e.target.value})}
-                                                />
-                                                <input 
-                                                    required 
-                                                    name="userPhone"
-                                                    type="tel" 
-                                                    placeholder="Phone" 
-                                                    className="w-1/2 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-xs placeholder:text-white/40 outline-none focus:border-[#FF9A55] transition-colors"
-                                                    onChange={(e) => setFormData({...formData, userPhone: e.target.value})}
-                                                />
-                                            </div>
-                                            <button 
-                                                disabled={isSubmitting}
-                                                className="w-full bg-[#FF9A55] text-[#073042] py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg hover:brightness-110 active:scale-95 transition-all mt-2"
-                                            >
+                                            <input required placeholder="Full Name" className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-[#FF9A55]" onChange={(e) => setFormData({...formData, userName: e.target.value})} />
+                                            <input required placeholder="Company Name" className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-[#FF9A55]" onChange={(e) => setFormData({...formData, companyName: e.target.value})} />
+                                            <input required type="email" placeholder="Work Email" className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-[#FF9A55]" onChange={(e) => setFormData({...formData, userEmail: e.target.value})} />
+                                            <input required type="tel" placeholder="Phone" className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-[#FF9A55]" onChange={(e) => setFormData({...formData, userPhone: e.target.value})} />
+                                            <button disabled={isSubmitting} className="w-full bg-[#FF9A55] text-[#073042] py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg hover:brightness-110 active:scale-95 transition-all mt-2">
                                                 {isSubmitting ? "Processing..." : "Secure My Strategy"}
                                             </button>
                                         </form>
                                     ) : (
-                                        <div className="mt-6 p-8 bg-green-50 rounded-[2rem] border-2 border-green-100 text-center animate-in zoom-in-95">
+                                        <div className="mt-6 p-8 bg-green-50 rounded-[2rem] text-center animate-in">
                                             <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto text-white shadow-lg mb-4">✓</div>
                                             <h3 className="font-bold text-green-900 mb-1">Lead Confirmed</h3>
                                             <p className="text-[10px] text-green-800 font-semibold leading-relaxed">Thank You! We will contact you within 24 hours to review your Incentives Roadmap. Your Complimentary "ProspAIrity Strategy Report" will be sent to your email shortly.</p>
-                                            <button onClick={() => setStep(0)} className="text-[9px] font-black text-green-600 uppercase tracking-widest mt-6 hover:text-green-700 underline">New Assessment</button>
                                         </div>
                                     )}
                                 </div>
@@ -288,5 +239,4 @@
         root.render(<App />);
     </script>
 </body>
-
 </html>
