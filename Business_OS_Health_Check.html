@@ -54,9 +54,9 @@
     <script type="text/babel">
         const { useState, useMemo, useEffect } = React;
 
-        /** * PROSPAIRITY BUSINESS OS HEALTH CHECK - WEBPAGE v1.5
+        /** * PROSPAIRITY BUSINESS OS HEALTH CHECK - WEBPAGE v1.6
          * Status: DEPLOYMENT READY + UNIFIED ACTION
-         * Updated: Fixed scroll-to-top issue & added strategic week descriptions
+         * Updated: Optimized Report layout flow for better UX conversion
          */
 
         const INDUSTRY_GROUPS = {
@@ -132,7 +132,7 @@
                 RETAIL: [
                     { id: 'D1', name: 'Revenue Engine & Transaction Stability', weight: 1.3, questions: [
                         { id: 'Q1', text: 'How predictable is your daily/monthly sales and traffic volume?', options: ['Highly unpredictable', 'Mostly reactive', 'Somewhat predictable', 'Mostly stable', 'Highly predictable'] },
-                        { id: 'Q2', text: 'How clearly defined is your marketing-to-conversion cycle (online or in-store)?', options: ['Not defined', 'Loosely understood', 'Partially mapped', 'Clearly structured', 'Fully documented'] },
+                        { id: 'Q2', text: 'How clearly mapped is your marketing-to-conversion cycle (online or in-store)?', options: ['Not defined', 'Loosely understood', 'Partially mapped', 'Clearly structured', 'Fully documented'] },
                         { id: 'Q3', text: 'What is your current customer return rate or subscription/membership baseline?', options: ['Very low', 'Some repeat', 'About average', 'Mostly repeat', 'Extremely loyal base'] },
                         { id: 'Q4', text: 'If your primary traffic source (SEO/Ad/Foot-traffic) stopped today, how exposed would you be?', options: ['Severe disruption', 'Significant disruption', 'Manageable strain', 'Minor impact', 'Minimal impact'] }
                     ]},
@@ -449,18 +449,9 @@
                                     </div>
                                 </div>
 
-                                <div className="text-center no-print">
-                                    <button 
-                                        onClick={handleUnifiedAction} 
-                                        disabled={isSubmitting} 
-                                        className="w-full bg-[#0C3D52] text-white p-8 rounded-[2.5rem] font-bold uppercase tracking-widest shadow-2xl hover:bg-[#073042] transition-all disabled:opacity-50 flex flex-col items-center gap-2 group"
-                                    >
-                                        <span className="text-xl md:text-2xl flex items-center gap-4 text-center">
-                                            {isSubmitting ? 'Processing...' : 'Submit for Strategy Review + Download Summary'}
-                                            {!isSubmitting && <Icons.MasterAction />}
-                                        </span>
-                                        <span className="text-[10px] opacity-40 font-normal group-hover:opacity-100">Final Step: Log findings & Save your 30-Day Roadmap</span>
-                                    </button>
+                                <div className="mt-8 text-center text-red-600 bg-red-50 p-6 rounded-3xl flex items-center justify-center gap-3 no-print">
+                                    <Icons.AlertTriangle />
+                                    <p className="text-sm font-bold uppercase tracking-widest">Structural Vulnerability Flags Detected</p>
                                 </div>
 
                                 <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-xl border-t-4 border-[#23B5D3]">
@@ -502,9 +493,19 @@
                                         ))}
                                     </div>
                                 </div>
-                                <div className="mt-8 text-center text-red-600 bg-red-50 p-6 rounded-3xl flex items-center justify-center gap-3 no-print">
-                                    <Icons.AlertTriangle />
-                                    <p className="text-sm font-bold uppercase tracking-widest">Structural Vulnerability Flags Detected</p>
+
+                                <div className="text-center no-print">
+                                    <button 
+                                        onClick={handleUnifiedAction} 
+                                        disabled={isSubmitting} 
+                                        className="w-full bg-[#0C3D52] text-white p-8 rounded-[2.5rem] font-bold uppercase tracking-widest shadow-2xl hover:bg-[#073042] transition-all disabled:opacity-50 flex flex-col items-center gap-2 group"
+                                    >
+                                        <span className="text-xl md:text-2xl flex items-center gap-4 text-center">
+                                            {isSubmitting ? 'Processing...' : 'Submit for Strategy Review + Download Summary'}
+                                            {!isSubmitting && <Icons.MasterAction />}
+                                        </span>
+                                        <span className="text-[10px] opacity-40 font-normal group-hover:opacity-100">Final Step: Log findings & Save your 30-Day Roadmap</span>
+                                    </button>
                                 </div>
                             </div>
                         )}
