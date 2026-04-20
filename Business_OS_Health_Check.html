@@ -37,6 +37,7 @@
 </head>
 <body>
     <!-- Netlify Hidden Form Detection -->
+    <!-- Updated with 'readableReport' to capture the formatted summary -->
     <form name="health-check-v1" data-netlify="true" hidden>
         <input type="text" name="fullName" />
         <input type="text" name="businessName" />
@@ -46,6 +47,7 @@
         <input type="text" name="teamSize" />
         <input type="text" name="opsScore" />
         <input type="text" name="primaryConstraint" />
+        <textarea name="readableReport"></textarea>
         <textarea name="fullData"></textarea>
     </form>
 
@@ -54,9 +56,9 @@
     <script type="text/babel">
         const { useState, useMemo, useEffect } = React;
 
-        /** * PROSPAIRITY BUSINESS OS HEALTH CHECK - WEBPAGE v1.6
-         * Status: DEPLOYMENT READY + UNIFIED ACTION
-         * Updated: Optimized Report layout flow for better UX conversion
+        /** * PROSPAIRITY BUSINESS OS HEALTH CHECK - WEBPAGE v1.7
+         * Status: DEPLOYMENT READY + ENHANCED DATA CAPTURE
+         * Updated: Logic to generate human-readable text report for Netlify/Email
          */
 
         const INDUSTRY_GROUPS = {
@@ -245,6 +247,41 @@
             const handleUnifiedAction = async () => {
                 setIsSubmitting(true);
                 
+                // GENERATE READABLE REPORT FOR EMAIL NOTIFICATION
+                let reportString = `PROSPAIRITY BUSINESS OS HEALTH CHECK\n`;
+                reportString += `====================================\n`;
+                reportString += `CLIENT: ${onboarding.fullName}\n`;
+                reportString += `BUSINESS: ${onboarding.businessName}\n`;
+                reportString += `INDUSTRY: ${onboarding.industry} (${industryGroup})\n`;
+                reportString += `TEAM SIZE: ${onboarding.teamSize}\n`;
+                reportString += `------------------------------------\n\n`;
+                
+                reportString += `SUMMARY SCORES:\n`;
+                reportString += `OPS Rating: ${results ? results.OPS.toFixed(1) : 'N/A'}\n`;
+                reportString += `Structural Integrity: ${results ? results.SI.toFixed(1) : 'N/A'}\n`;
+                reportString += `Growth Readiness: ${results ? results.GR.toFixed(1) : 'N/A'}\n`;
+                reportString += `Owner Dependency: ${results ? results.ODI.toFixed(1) : 'N/A'}\n`;
+                reportString += `Primary Constraint: ${results ? results.primaryConstraint.name : 'N/A'}\n\n`;
+
+                reportString += `DETAILED QUESTION RESPONSES:\n`;
+                adaptiveDomains.forEach(domain => {
+                    reportString += `\n[DOMAIN: ${domain.name}]\n`;
+                    domain.questions.forEach(q => {
+                        const answerIdx = answers[q.id];
+                        const answerText = q.options[answerIdx] || 'No answer';
+                        const score = SCORE_VALUES[answerIdx] || 0;
+                        reportString += `Q: ${q.text}\n`;
+                        reportString += `A: ${answerText} (Score: ${score})\n`;
+                    });
+                });
+
+                if (Object.keys(d9Answers).length > 0) {
+                    reportString += `\n[CONFIDENTIAL STRAIN ANALYSIS]\n`;
+                    D9_CONTENT.questions.forEach(q => {
+                        reportString += `${q.text}: ${d9Answers[q.id] || 'Skipped'}\n`;
+                    });
+                }
+
                 // 1. Submit Data to Netlify
                 const formData = new FormData();
                 formData.append("form-name", "health-check-v1");
@@ -257,6 +294,10 @@
                 formData.append("opsScore", results ? results.OPS.toFixed(1) : "0.0");
                 formData.append("primaryConstraint", results ? results.primaryConstraint.name : "N/A");
                 
+                // The field that Netlify will send in the email:
+                formData.append("readableReport", reportString);
+                
+                // Keep the JSON blob as a backup
                 const dataPayload = {
                     onboarding,
                     domainScores: results ? results.domainAverages.map(d => ({ name: d.name, score: d.avg })) : [],
@@ -271,13 +312,13 @@
                         body: new URLSearchParams(formData).toString(),
                     });
                     
-                    // 2. Trigger Print Dialog immediately after successful submission trigger
+                    // 2. Trigger Print Dialog
                     window.print();
                     
                     // 3. Move to completion screen
                     setStage('submitted');
                 } catch (err) {
-                    window.print(); // Still allow print even if submission fails
+                    window.print(); 
                     setStage('submitted'); 
                 } finally {
                     setIsSubmitting(false);
