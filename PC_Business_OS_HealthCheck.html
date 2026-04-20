@@ -1,0 +1,426 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  ChevronRight, 
+  ChevronLeft, 
+  ShieldCheck, 
+  AlertTriangle, 
+  Target,
+  ArrowRight,
+  CheckCircle2,
+  Info,
+  Activity
+} from 'lucide-react';
+
+/** * PROSPAIRITY BUSINESS OS HEALTH CHECK - WEBPAGE v1.2
+ * Status: MODULAR INDUSTRY LOGIC (FIXED)
+ * Archetypes: SERVICES, CLINICAL, PHYSICAL, RETAIL
+ * Brand Font: Montserrat
+ */
+
+// 1. INDUSTRY GROUPING DEFINITIONS
+const INDUSTRY_GROUPS = {
+  SERVICES: ["Professional Services", "SaaS / Tech", "Marketing Agency", "Finance / Insurance", "Non-Profit", "Consulting", "Education"],
+  CLINICAL: ["Healthcare / Clinical"],
+  PHYSICAL: ["Construction / Trades", "Real Estate", "Manufacturing"],
+  RETAIL: ["E-commerce", "Retail", "Hospitality", "Other"]
+};
+
+const getGroup = (industry) => {
+  for (const [group, list] of Object.entries(INDUSTRY_GROUPS)) {
+    if (list.includes(industry)) return group;
+  }
+  return "SERVICES"; 
+};
+
+// 2. SCORING CONSTANTS
+const TIERS = [
+  { min: 4.2, label: 'Structurally Controlled', color: 'text-green-600', bg: 'bg-green-50' },
+  { min: 3.2, label: 'Functional but Constrained', color: 'text-blue-600', bg: 'bg-blue-50' },
+  { min: 2.2, label: 'Structurally Vulnerable', color: 'text-yellow-600', bg: 'bg-yellow-50' },
+  { min: 1.2, label: 'Fragile', color: 'text-orange-600', bg: 'bg-orange-50' },
+  { min: 0, label: 'Critical', color: 'text-red-600', bg: 'bg-red-50' }
+];
+
+const getTier = (val) => TIERS.find(t => val >= t.min) || TIERS[TIERS.length - 1];
+
+const SCORE_VALUES = [0, 1, 2, 3, 5]; 
+
+// 3. MODULAR QUESTION BANK (ALL 8 DOMAINS)
+const getAdaptiveDomains = (group) => {
+  const banks = {
+    SERVICES: [
+      { id: 'D1', name: 'Revenue Engine & Demand Stability', weight: 1.3, questions: [
+        { id: 'Q1', text: 'How predictable is your monthly recurring or project-based revenue?', options: ['Highly unpredictable', 'Mostly reactive', 'Somewhat predictable', 'Mostly stable', 'Highly predictable'] },
+        { id: 'Q2', text: 'How clearly mapped is your client acquisition funnel from lead to signed contract?', options: ['Not defined', 'Loosely understood', 'Partially mapped', 'Clearly structured', 'Fully documented'] },
+        { id: 'Q3', text: 'What percentage of your revenue comes from retained or repeat client accounts?', options: ['Very little', 'Some', 'About half', 'Mostly repeat', 'Strong repeat base'] },
+        { id: 'Q4', text: 'If your primary lead source stopped today, how exposed would your revenue be?', options: ['Severe disruption', 'Significant disruption', 'Manageable strain', 'Minor impact', 'Minimal impact'] }
+      ]},
+      { id: 'D2', name: 'Process Standardization', weight: 1.3, questions: [
+        { id: 'Q5', text: 'How consistently are client deliverables executed the same way every time?', options: ['Never consistent', 'Rarely consistent', 'Sometimes consistent', 'Often consistent', 'Always consistent'] },
+        { id: 'Q6', text: 'How dependent are project outcomes on your personal expertise vs. a team process?', options: ['Completely dependent', 'Mostly dependent', 'Partially dependent', 'Mostly process-driven', 'Fully process-driven'] },
+        { id: 'Q7', text: 'How often does "Scope Creep" or rework happen due to unclear internal SOPs?', options: ['Very frequently', 'Frequently', 'Occasionally', 'Rarely', 'Almost never'] },
+        { id: 'Q8', text: 'Are your core service workflows documented in an accessible Knowledge Base?', options: ['Not documented', 'Lightly documented', 'Partially followed', 'Mostly followed', 'Fully documented and used'] }
+      ]}
+    ],
+    CLINICAL: [
+      { id: 'D1', name: 'Revenue Engine & Patient Stability', weight: 1.3, questions: [
+        { id: 'Q1', text: 'How predictable is your monthly patient volume and appointment revenue?', options: ['Highly unpredictable', 'Mostly reactive', 'Somewhat predictable', 'Mostly stable', 'Highly predictable'] },
+        { id: 'Q2', text: 'How clearly defined is your referral and intake process for new patients?', options: ['Not defined', 'Loosely understood', 'Partially mapped', 'Clearly structured', 'Fully documented'] },
+        { id: 'Q3', text: 'What is the frequency of follow-up visits or long-term care plans for your patient base?', options: ['Very low', 'Some follow-up', 'Steady mix', 'High retention', 'Exceptional retention'] },
+        { id: 'Q4', text: 'If your primary referral source stopped today, how exposed would the practice be?', options: ['Severe disruption', 'Significant disruption', 'Manageable strain', 'Minor impact', 'Minimal impact'] }
+      ]},
+      { id: 'D2', name: 'Process Standardization', weight: 1.3, questions: [
+        { id: 'Q5', text: 'How consistently are administrative and clinical intake tasks executed?', options: ['Never consistent', 'Rarely consistent', 'Sometimes consistent', 'Often consistent', 'Always consistent'] },
+        { id: 'Q6', text: 'How dependent is the quality of care on specific staff members vs. practice protocols?', options: ['Completely dependent', 'Mostly dependent', 'Partially dependent', 'Mostly protocol-driven', 'Fully protocol-driven'] },
+        { id: 'Q7', text: 'How often do billing or clinical errors occur due to unclear administrative SOPs?', options: ['Very frequently', 'Frequently', 'Occasionally', 'Rarely', 'Almost never'] },
+        { id: 'Q8', text: 'Are your practice workflows and compliance steps documented and followed by all?', options: ['Not documented', 'Lightly documented', 'Partially followed', 'Mostly followed', 'Fully documented and used'] }
+      ]}
+    ],
+    PHYSICAL: [
+      { id: 'D1', name: 'Revenue Engine & Project Pipeline Stability', weight: 1.3, questions: [
+        { id: 'Q1', text: 'How predictable is your monthly revenue based on your current project backlog?', options: ['Highly unpredictable', 'Mostly reactive', 'Somewhat predictable', 'Mostly stable', 'Highly predictable'] },
+        { id: 'Q2', text: 'How clearly defined is your sales cycle from bid/estimate to job kickoff?', options: ['Not defined', 'Loosely understood', 'Partially mapped', 'Clearly structured', 'Fully documented'] },
+        { id: 'Q3', text: 'What percentage of your work comes from repeat customers or established contractor partners?', options: ['Very little', 'Some', 'About half', 'Mostly repeat', 'Strong repeat base'] },
+        { id: 'Q4', text: 'If your primary source of new bids/leads stopped today, how exposed would you be?', options: ['Severe disruption', 'Significant disruption', 'Manageable strain', 'Minor impact', 'Minimal impact'] }
+      ]},
+      { id: 'D2', name: 'Process Standardization', weight: 1.3, questions: [
+        { id: 'Q5', text: 'How consistently is site work or production executed to standard every time?', options: ['Never consistent', 'Rarely consistent', 'Sometimes consistent', 'Often consistent', 'Always consistent'] },
+        { id: 'Q6', text: 'How dependent are job outcomes on specific "star" leads rather than company systems?', options: ['Completely dependent', 'Mostly dependent', 'Partially dependent', 'Mostly system-driven', 'Fully system-driven'] },
+        { id: 'Q7', text: 'How often does "Field Rework" happen due to missing info or unclear specs?', options: ['Very frequently', 'Frequently', 'Occasionally', 'Rarely', 'Almost never'] },
+        { id: 'Q8', text: 'Are your core production workflows documented and usable by field teams?', options: ['Not documented', 'Lightly documented', 'Partially followed', 'Mostly followed', 'Fully documented and used'] }
+      ]}
+    ],
+    RETAIL: [
+      { id: 'D1', name: 'Revenue Engine & Transaction Stability', weight: 1.3, questions: [
+        { id: 'Q1', text: 'How predictable is your daily/monthly sales and traffic volume?', options: ['Highly unpredictable', 'Mostly reactive', 'Somewhat predictable', 'Mostly stable', 'Highly predictable'] },
+        { id: 'Q2', text: 'How clearly defined is your marketing-to-conversion cycle (online or in-store)?', options: ['Not defined', 'Loosely understood', 'Partially mapped', 'Clearly structured', 'Fully documented'] },
+        { id: 'Q3', text: 'What is your current customer return rate or subscription/membership baseline?', options: ['Very low', 'Some repeat', 'About average', 'Mostly repeat', 'Extremely loyal base'] },
+        { id: 'Q4', text: 'If your primary traffic source (SEO/Ad/Foot-traffic) stopped today, how exposed would you be?', options: ['Severe disruption', 'Significant disruption', 'Manageable strain', 'Minor impact', 'Minimal impact'] }
+      ]},
+      { id: 'D2', name: 'Process Standardization', weight: 1.3, questions: [
+        { id: 'Q5', text: 'How consistently is order fulfillment or service delivery executed?', options: ['Never consistent', 'Rarely consistent', 'Sometimes consistent', 'Often consistent', 'Always consistent'] },
+        { id: 'Q6', text: 'How dependent is the store/site experience on specific managers rather than a system?', options: ['Completely dependent', 'Mostly dependent', 'Partially dependent', 'Mostly system-driven', 'Fully system-driven'] },
+        { id: 'Q7', text: 'How often do service/fulfillment errors happen due to unclear shift protocols?', options: ['Very frequently', 'Frequently', 'Occasionally', 'Rarely', 'Almost never'] },
+        { id: 'Q8', text: 'Are your core operational SOPs documented and used for training?', options: ['Not documented', 'Lightly documented', 'Partially followed', 'Mostly followed', 'Fully documented and used'] }
+      ]}
+    ]
+  };
+
+  const getUniversalDomains = (group) => {
+    const terms = {
+      SERVICES: "client",
+      CLINICAL: "patient",
+      PHYSICAL: "customer",
+      RETAIL: "customer"
+    }[group] || "client";
+
+    return [
+      { id: 'D3', name: 'Financial Visibility & Margin Control', weight: 1.3, questions: [
+        { id: 'Q9', text: 'How clearly do you understand your true profit margins per job or service?', options: ['Not at all', 'Rough estimate', 'Some clarity', 'Clear understanding', 'Fully tracked'] },
+        { id: 'Q10', text: 'How often do financial surprises (cash crunch, tax issues) occur?', options: ['Constantly', 'Frequently', 'Occasionally', 'Rarely', 'Almost never'] },
+        { id: 'Q11', text: 'Are your monthly financial reports used to make active hiring or spending decisions?', options: ['Not connected', 'Loosely connected', 'Sometimes considered', 'Usually considered', 'Fully integrated'] },
+        { id: 'Q12', text: 'Can you confidently forecast cash flow 60–90 days ahead?', options: ['Not at all', 'Barely', 'Somewhat', 'Mostly', 'Completely'] }
+      ]},
+      { id: 'D4', name: 'Decision & Accountability Clarity', weight: 1.2, questions: [
+        { id: 'Q13', text: 'How clearly defined are decision rights across your leadership team?', options: ['Not clear', 'Somewhat unclear', 'Partially defined', 'Mostly clear', 'Fully defined'] },
+        { id: 'Q14', text: 'How often do routine execution issues escalate to you unnecessarily?', options: ['Constantly', 'Frequently', 'Sometimes', 'Rarely', 'Almost never'] },
+        { id: 'Q15', text: `How confident are team members in owning ${terms} outcomes without your input?`, options: ['Not confident', 'Low confidence', 'Moderate confidence', 'High confidence', 'Fully empowered'] }
+      ]},
+      { id: 'D5', name: `${group === 'CLINICAL' ? 'Patient' : 'Client'} Experience Consistency`, weight: 1.1, questions: [
+        { id: 'Q16', text: `How consistent is the ${terms} experience from first contact to completion?`, options: ['Highly inconsistent', 'Often inconsistent', 'Sometimes consistent', 'Mostly consistent', 'Highly consistent'] },
+        { id: 'Q17', text: `Is the ${terms} journey clearly designed or just "happening"?`, options: ['Accidental', 'Loosely understood', 'Partially structured', 'Mostly structured', 'Fully designed'] },
+        { id: 'Q18', text: `How reliably do you collect feedback after ${terms} service is complete?`, options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always'] }
+      ]},
+      { id: 'D6', name: 'Operational Visibility', weight: 1.1, questions: [
+        { id: 'Q19', text: 'How quickly can you assess the actual health of your daily operations?', options: ['Total fog', 'With significant effort', 'With some review', 'Quickly', 'Instantly at a glance'] },
+        { id: 'Q20', text: 'How consistently are key performance metrics reviewed?', options: ['Never', 'Rarely', 'Occasionally', 'Often', 'Fixed rhythm'] },
+        { id: 'Q21', text: 'How early are operational risks typically identified?', options: ['After damage', 'Late', 'Sometimes early', 'Often early', 'Proactively'] }
+      ]},
+      { id: 'D7', name: 'Leadership Load & Stability', weight: 1.2, questions: [
+        { id: 'Q22', text: 'How much uninterrupted strategic time do you protect every week?', options: ['None', 'Very little', 'Some', 'Protected regularly', 'Strongly protected'] },
+        { id: 'Q23', text: 'How often are you pulled back into routine execution issues?', options: ['Constantly', 'Frequently', 'Sometimes', 'Rarely', 'Almost never'] },
+        { id: 'Q24', text: 'How comfortable are you stepping away from the business for 7 days?', options: ['Terrified', 'Very uncomfortable', 'Somewhat uncomfortable', 'Mostly comfortable', 'Fully comfortable'] },
+        { id: 'Q25', text: 'How often do urgent issues override your strategic priorities?', options: ['Constantly', 'Frequently', 'Sometimes', 'Rarely', 'Almost never'] }
+      ]},
+      { id: 'D8', name: 'Systemization & Tool Alignment', weight: 1.0, questions: [
+        { id: 'Q26', text: 'How aligned are your software tools with your actual workflows?', options: ['Friction-filled', 'Poorly aligned', 'Somewhat aligned', 'Mostly aligned', 'Fully aligned'] },
+        { id: 'Q27', text: 'How much manual data duplication exists between your systems?', options: ['Extreme', 'Quite a bit', 'Some', 'Minimal', 'Almost none'] },
+        { id: 'Q28', text: 'Does your automation support the process—or try to hide a broken one?', options: ['Mostly hiding flaws', 'Often hiding', 'Mixed', 'Mostly supporting', 'Fully supporting'] }
+      ]}
+    ];
+  };
+
+  return [...(banks[group] || banks.SERVICES), ...getUniversalDomains(group)];
+};
+
+const D9_CONTENT = {
+  preamble: `Most business diagnostics ignore external strain. Data does not. Research consistently shows that small and mid-sized business instability is strongly correlated with owner bandwidth and decision fatigue. This section is confidential and optional. It does not change your structural score; it informs the pacing of our potential strategy.`,
+  questions: [
+    { id: 'Q29', type: 'select', text: 'Over the past 12 months, have significant life events affected your business energy?', options: ['Yes', 'No', 'Prefer not to say'] },
+    { id: 'Q30', type: 'select', text: 'Strategic hours per week currently available:', options: ['0–2', '3–5', '6–10', '10+'] },
+    { id: 'Q31', type: 'select', text: 'Is your current business workload personally sustainable for another year?', options: ['Not sustainable', 'Strained', 'Manageable', 'Sustainable'] },
+    { id: 'Q32', type: 'text', text: 'Are there external responsibilities currently affecting your operating bandwidth?' }
+  ]
+};
+
+export default function App() {
+  const [stage, setStage] = useState('intro');
+  const [onboarding, setOnboarding] = useState({ 
+    fullName: '', businessName: '', phone: '', email: '', teamSize: '', industry: '' 
+  });
+  const [answers, setAnswers] = useState({});
+  const [d9Answers, setD9Answers] = useState({});
+  const [currentDomainIdx, setCurrentDomainIdx] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const industryGroup = useMemo(() => getGroup(onboarding.industry), [onboarding.industry]);
+  const adaptiveDomains = useMemo(() => getAdaptiveDomains(industryGroup), [industryGroup]);
+
+  const results = useMemo(() => {
+    if (stage !== 'report' && stage !== 'submitted') return null;
+
+    const domainAverages = adaptiveDomains.map(domain => {
+      const qScores = domain.questions.map(q => SCORE_VALUES[answers[q.id]] ?? 0);
+      const avg = qScores.reduce((a, b) => a + b, 0) / qScores.length;
+      return { ...domain, avg, adjusted: avg * domain.weight };
+    });
+
+    // Total weights for normalization
+    const siWeightTotal = adaptiveDomains.filter(d => ['D2', 'D3', 'D4', 'D6'].includes(d.id)).reduce((s, d) => s + d.weight, 0);
+    const grWeightTotal = adaptiveDomains.filter(d => ['D1', 'D5', 'D8'].includes(d.id)).reduce((s, d) => s + d.weight, 0);
+
+    const SI = domainAverages.filter(d => ['D2', 'D3', 'D4', 'D6'].includes(d.id)).reduce((sum, d) => sum + d.adjusted, 0) / siWeightTotal;
+    const GR = domainAverages.filter(d => ['D1', 'D5', 'D8'].includes(d.id)).reduce((sum, d) => sum + d.adjusted, 0) / grWeightTotal;
+    const d7Avg = (domainAverages.find(d => d.id === 'D7')?.avg) || 0;
+    const ODI = 5 - d7Avg;
+    const OPS = (SI + GR + (5 - ODI)) / 3;
+
+    const sortedDomains = [...domainAverages].sort((a, b) => a.avg - b.avg);
+    const primaryConstraint = sortedDomains[0];
+
+    return { domainAverages, SI, GR, ODI, OPS, primaryConstraint };
+  }, [answers, stage, adaptiveDomains]);
+
+  const submitFinalReport = async () => {
+    setIsSubmitting(true);
+    try {
+      await new Promise(r => setTimeout(r, 1000)); // Simulating submission
+      setStage('submitted');
+    } catch (err) {
+      setStage('submitted');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isFormValid = onboarding.fullName && onboarding.businessName && onboarding.phone && onboarding.email && onboarding.teamSize && onboarding.industry;
+
+  const ProgressBar = () => (
+    <div className="w-full h-1 bg-gray-100 rounded-full mb-12 overflow-hidden">
+      <div 
+        className="h-full bg-[#23B5D3] transition-all duration-500" 
+        style={{ width: `${(currentDomainIdx / adaptiveDomains.length) * 100}%` }} 
+      />
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#F4FAFD] py-12 px-4 sm:px-6 lg:px-8 selection:bg-[#FF9A55]/30 text-[#073042]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet" />
+      <style>{`
+        * { font-family: 'Montserrat', sans-serif !important; }
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        select { background-image: none; }
+      `}</style>
+
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <div className="inline-block px-4 py-1.5 bg-blue-50 rounded-full border border-blue-100 mb-4">
+             <span className="text-[10px] font-black tracking-[0.2em] uppercase text-[#23B5D3]">ProspAIrity Intelligence Unit</span>
+          </div>
+          <h1 className="text-3xl md:text-5xl font-bold text-[#0C3D52]">Business OS Health Check</h1>
+        </div>
+
+        {stage === 'intro' && (
+          <div className="bg-white rounded-[3rem] p-8 md:p-16 shadow-2xl border border-white/80 fade-in text-left">
+            <h2 className="text-2xl font-bold text-[#0C3D52] mb-6">Discovery Phase</h2>
+            <div className="space-y-6 text-[#073042] text-lg leading-relaxed font-semibold">
+              <p>Welcome to the ProspAIrity Diagnostic. This health check assesses the structural integrity of your internal operations across 8 critical domains.</p>
+              <p className="font-bold text-[#0C3D52]">Guidelines:</p>
+              <ul className="space-y-4 list-none p-0">
+                <li className="flex gap-3 items-start"><CheckCircle2 className="text-[#23B5D3] shrink-0 mt-1" size={20} /> Be honest. This is for strategy, not sales.</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 className="text-[#23B5D3] shrink-0 mt-1" size={20} /> Base answers on current reality, not future intent.</li>
+              </ul>
+            </div>
+            <button onClick={() => setStage('onboarding')} className="mt-12 w-full bg-[#FF9A55] text-white py-6 rounded-2xl font-bold text-xl uppercase tracking-widest shadow-xl hover:translate-y-[-2px] transition-all flex items-center justify-center gap-4">
+              Begin Diagnostic <ArrowRight size={20} />
+            </button>
+          </div>
+        )}
+
+        {stage === 'onboarding' && (
+          <div className="bg-white rounded-[3rem] p-8 md:p-16 shadow-2xl fade-in text-left">
+            <h2 className="text-2xl font-bold text-[#0C3D52] mb-10 text-center md:text-left">Business Profile & Contact</h2>
+            <div className="space-y-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+                <div className="space-y-3">
+                  <label className="text-lg font-black uppercase tracking-widest text-[#073042] ml-2">Full Name</label>
+                  <input type="text" placeholder="Your Name" value={onboarding.fullName} onChange={(e) => setOnboarding({...onboarding, fullName: e.target.value})} className="w-full p-5 bg-[#F4FAFD] border-2 border-transparent focus:border-[#23B5D3] rounded-2xl outline-none font-bold text-[#0C3D52] transition-all placeholder:text-gray-400" />
+                </div>
+                <div className="space-y-3">
+                  <label className="text-lg font-black uppercase tracking-widest text-[#073042] ml-2">Business Name</label>
+                  <input type="text" placeholder="Company Name" value={onboarding.businessName} onChange={(e) => setOnboarding({...onboarding, businessName: e.target.value})} className="w-full p-5 bg-[#F4FAFD] border-2 border-transparent focus:border-[#23B5D3] rounded-2xl outline-none font-bold text-[#0C3D52] transition-all placeholder:text-gray-400" />
+                </div>
+                <div className="space-y-3">
+                  <label className="text-lg font-black uppercase tracking-widest text-[#073042] ml-2">Phone Number</label>
+                  <input type="tel" placeholder="(555) 555-5555" value={onboarding.phone} onChange={(e) => setOnboarding({...onboarding, phone: e.target.value})} className="w-full p-5 bg-[#F4FAFD] border-2 border-transparent focus:border-[#23B5D3] rounded-2xl outline-none font-bold text-[#0C3D52] transition-all placeholder:text-gray-400" />
+                </div>
+                <div className="space-y-3">
+                  <label className="text-lg font-black uppercase tracking-widest text-[#073042] ml-2">Business Email</label>
+                  <input type="email" placeholder="email@business.com" value={onboarding.email} onChange={(e) => setOnboarding({...onboarding, email: e.target.value})} className="w-full p-5 bg-[#F4FAFD] border-2 border-transparent focus:border-[#23B5D3] rounded-2xl outline-none font-bold text-[#0C3D52] transition-all placeholder:text-gray-400" />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-lg font-black uppercase tracking-widest text-[#073042] ml-2">Team Size</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {["Solo", "2–5", "6–10", "11–20", "21–50", "51+"].map(size => (
+                    <button key={size} onClick={() => setOnboarding({...onboarding, teamSize: size})} className={`p-5 rounded-2xl border-2 font-bold transition-all ${onboarding.teamSize === size ? 'border-[#23B5D3] bg-blue-50 text-[#0C3D52]' : 'border-gray-100 text-[#073042]/40 hover:border-blue-100'}`}>
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-lg font-black uppercase tracking-widest text-[#073042] ml-2">Primary Industry</label>
+                <div className="relative">
+                  <select value={onboarding.industry} onChange={(e) => setOnboarding({...onboarding, industry: e.target.value})} className="w-full p-6 bg-[#F4FAFD] rounded-2xl font-bold text-[#0C3D52] outline-none border-2 border-transparent focus:border-[#23B5D3] appearance-none">
+                    <option value="">Select Industry...</option>
+                    {["Professional Services", "Healthcare / Clinical", "SaaS / Tech", "Construction / Trades", "Real Estate", "Manufacturing", "E-commerce", "Retail", "Hospitality", "Education", "Marketing Agency", "Finance / Insurance", "Non-Profit", "Consulting", "Other"].map(i => <option key={i} value={i}>{i}</option>)}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-[#23B5D3]">
+                    <ChevronLeft className="-rotate-90" size={20} />
+                  </div>
+                </div>
+              </div>
+              
+              <button disabled={!isFormValid} onClick={() => setStage('questions')} className="w-full bg-[#FF9A55] text-white py-7 rounded-2xl font-bold uppercase tracking-widest disabled:opacity-30 transition-all shadow-xl text-2xl mt-4">
+                Let's Discover
+              </button>
+            </div>
+          </div>
+        )}
+
+        {stage === 'questions' && (
+          <div className="fade-in">
+            <ProgressBar />
+            {currentDomainIdx < adaptiveDomains.length ? (
+              <div className="bg-white rounded-[3rem] p-8 md:p-16 shadow-2xl border border-white/80">
+                <p className="text-[#23B5D3] font-black uppercase tracking-[0.2em] text-[10px] mb-2">Domain {currentDomainIdx + 1} of 8</p>
+                <h2 className="text-3xl font-bold text-[#0C3D52] mb-12 leading-tight text-left">{adaptiveDomains[currentDomainIdx].name}</h2>
+                <div className="space-y-12">
+                  {adaptiveDomains[currentDomainIdx].questions.map(q => (
+                    <div key={q.id} className="space-y-6">
+                      <p className="text-xl font-bold text-[#0C3D52] leading-snug text-left">{q.text}</p>
+                      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                        {q.options.map((opt, idx) => (
+                          <button key={idx} onClick={() => setAnswers({...answers, [q.id]: idx})} className={`p-4 rounded-2xl text-xs font-bold transition-all border-2 flex items-center justify-center text-center h-20 ${answers[q.id] === idx ? 'border-[#23B5D3] bg-blue-50 text-[#0C3D52]' : 'border-gray-50 text-[#073042]/40 hover:border-blue-50 hover:bg-gray-50'}`}>
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-16 flex justify-between gap-4">
+                  <button onClick={() => setCurrentDomainIdx(prev => prev - 1)} disabled={currentDomainIdx === 0} className="flex items-center gap-2 px-8 py-4 font-bold text-[#073042]/40 disabled:opacity-0">
+                    <ChevronLeft size={20} /> Back
+                  </button>
+                  <button disabled={adaptiveDomains[currentDomainIdx].questions.some(q => answers[q.id] === undefined)} onClick={() => setCurrentDomainIdx(prev => prev + 1)} className="bg-[#0C3D52] text-white px-12 py-5 rounded-2xl font-bold flex items-center gap-3 shadow-lg">
+                    Next Domain <ChevronRight size={20} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-[3rem] p-8 md:p-16 shadow-2xl border border-white/80 fade-in text-left">
+                <div className="flex items-center gap-3 mb-6"><span className="text-xs font-black uppercase tracking-widest text-[#23B5D3]">Structural Reality Check</span></div>
+                <div className="bg-gray-50 p-6 rounded-3xl text-[#073042]/60 text-sm italic leading-relaxed mb-10 font-bold">{D9_CONTENT.preamble}</div>
+                <div className="space-y-10">
+                  {D9_CONTENT.questions.map(q => (
+                    <div key={q.id} className="space-y-4">
+                      <p className="font-bold text-[#0C3D52]">{q.text}</p>
+                      {q.type === 'select' ? (
+                        <div className="flex flex-wrap gap-3">
+                          {q.options.map(opt => <button key={opt} onClick={() => setD9Answers({...d9Answers, [q.id]: opt})} className={`px-6 py-3 rounded-xl border-2 font-bold text-sm transition-all ${d9Answers[q.id] === opt ? 'border-[#23B5D3] bg-blue-50 text-[#0C3D52]' : 'border-gray-100 text-[#073042]/40'}`}>{opt}</button>)}
+                        </div>
+                      ) : <textarea onChange={(e) => setD9Answers({...d9Answers, [q.id]: e.target.value})} placeholder="Confidential notes..." className="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#23B5D3] font-bold text-[#0C3D52] placeholder:text-[#073042]/30" rows={3} />}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-16 flex gap-4">
+                   <button onClick={() => setCurrentDomainIdx(prev => prev - 1)} className="flex items-center gap-2 px-8 py-4 font-bold text-[#073042]/40"><ChevronLeft size={20} /> Back</button>
+                  <button onClick={() => setStage('report')} className="flex-grow bg-[#FF9A55] text-white py-6 rounded-3xl font-bold text-xl uppercase tracking-widest shadow-xl">Analyze Results</button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {stage === 'report' && results && (
+          <div className="space-y-10 fade-in pb-24 text-left">
+             <div className="bg-[#0C3D52] text-white rounded-[4rem] p-10 md:p-14 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-[-20%] right-[-10%] w-96 h-96 bg-[#23B5D3] opacity-10 blur-[100px] rounded-full"></div>
+                <div className="relative z-10 grid md:grid-cols-2 items-center gap-12 text-center md:text-left">
+                   <div>
+                      <p className="text-aqua-intel font-black uppercase tracking-[0.3em] text-[10px] mb-4">Official Diagnostic Rating</p>
+                      <h2 className="text-6xl font-black mb-4">OPS: {results.OPS.toFixed(1)}</h2>
+                      <div className={`inline-block px-6 py-2 rounded-full font-bold uppercase tracking-widest text-xs ${getTier(results.OPS).bg} ${getTier(results.OPS).color}`}>
+                        {getTier(results.OPS).label}
+                      </div>
+                   </div>
+                   <div className="grid grid-cols-1 gap-6 text-left">
+                      <div className="flex items-center justify-between border-b border-white/10 pb-2"><p className="text-[10px] font-black uppercase text-white/40 tracking-widest">Structural Integrity</p><p className="text-2xl font-black">{results.SI.toFixed(1)}</p></div>
+                      <div className="flex items-center justify-between border-b border-white/10 pb-2"><p className="text-[10px] font-black uppercase text-white/40 tracking-widest">Growth Readiness</p><p className="text-2xl font-black">{results.GR.toFixed(1)}</p></div>
+                      <div className="flex items-center justify-between border-b border-white/10 pb-2"><p className="text-[10px] font-black uppercase text-white/40 tracking-widest">Owner Dependency</p><p className="text-2xl font-black">{results.ODI.toFixed(1)}</p></div>
+                   </div>
+                </div>
+             </div>
+             <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-xl border-t-4 border-[#23B5D3]">
+                <h3 className="text-2xl font-black text-[#0C3D52] mb-12 uppercase tracking-widest">Initial 30-Day Strategic Focus</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                   {[{ wk: 1, title: 'Stabilize', focus: (results.primaryConstraint?.name || "Operations") }, { wk: 2, title: 'Clarify', focus: 'Financial Visibility' }, { wk: 3, title: 'Standardize', focus: 'Process Core' }, { wk: 4, title: 'Make Visible', focus: 'Metric Rhythm' }].map(w => (
+                     <div key={w.wk} className="p-6 border-2 border-gray-50 rounded-3xl space-y-4">
+                        <p className="text-[10px] font-black uppercase text-[#073042]/30 tracking-widest">Week 0{w.wk}</p>
+                        <h4 className="font-black text-[#0C3D52] text-lg uppercase">{w.title}</h4>
+                        <div className="h-0.5 w-10 bg-[#23B5D3] rounded-full"></div>
+                        <p className="text-xs font-bold text-[#073042]/50 uppercase tracking-wider">{w.focus}</p>
+                     </div>
+                   ))}
+                </div>
+             </div>
+             <div className="text-center pt-8">
+                <button onClick={submitFinalReport} disabled={isSubmitting} className="bg-[#0C3D52] text-white px-16 py-8 rounded-[2rem] font-bold text-xl uppercase tracking-widest shadow-2xl transition-all disabled:opacity-50">
+                  {isSubmitting ? 'Submitting...' : 'Submit for Founder Review'}
+                </button>
+             </div>
+          </div>
+        )}
+
+        {stage === 'submitted' && (
+          <div className="bg-white rounded-[4rem] p-16 shadow-2xl text-center fade-in border-4 border-green-50">
+             <div className="w-24 h-24 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-10"><ShieldCheck size={48} /></div>
+             <h2 className="text-4xl font-black text-[#0C3D52] mb-6 uppercase tracking-widest">Discovery Complete</h2>
+             <p className="text-xl text-[#073042]/60 font-bold mb-12 max-w-xl mx-auto leading-relaxed">Your data has been submitted for executive review. The ProspAIrity Team will evaluate the findings and contact you for a strategic walkthrough.</p>
+             <button onClick={() => window.location.href = 'https://www.prospairityconsulting.com'} className="px-12 py-5 bg-[#FF9A55] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl">Return to ProspAIrity</button>
+          </div>
+        )}
+      </div>
+      
+      <footer className="mt-20 py-12 text-center text-[#073042]/20">
+        <p className="text-[10px] font-black uppercase tracking-[0.5em]">© 2024 ProspAIrity Consulting • Strictly Confidential</p>
+      </footer>
+    </div>
+  );
+}-
