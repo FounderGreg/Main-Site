@@ -37,7 +37,6 @@
 </head>
 <body>
     <!-- Netlify Hidden Form Detection -->
-    <!-- Updated with 'readableReport' to capture the formatted summary -->
     <form name="health-check-v1" data-netlify="true" hidden>
         <input type="text" name="fullName" />
         <input type="text" name="businessName" />
@@ -56,13 +55,13 @@
     <script type="text/babel">
         const { useState, useMemo, useEffect } = React;
 
-        /** * PROSPAIRITY BUSINESS OS HEALTH CHECK - WEBPAGE v1.7
-         * Status: DEPLOYMENT READY + ENHANCED DATA CAPTURE
-         * Updated: Logic to generate human-readable text report for Netlify/Email
+        /** * PROSPAIRITY BUSINESS OS HEALTH CHECK - WEBPAGE v1.6
+         * Status: DEPLOYMENT READY + MASTER LOCKED
+         * Updated: Added Professional Care & Wellness industries; Optimized Report layout
          */
 
         const INDUSTRY_GROUPS = {
-            SERVICES: ["Professional Services", "SaaS / Tech", "Marketing Agency", "Finance / Insurance", "Non-Profit", "Consulting", "Education"],
+            SERVICES: ["Professional Services", "SaaS / Tech", "Marketing Agency", "Finance / Insurance", "Non-Profit", "Consulting", "Education", "Professional Care Services", "Wellness / Fitness"],
             CLINICAL: ["Healthcare / Clinical"],
             PHYSICAL: ["Construction / Trades", "Real Estate", "Manufacturing"],
             RETAIL: ["E-commerce", "Retail", "Hospitality", "Other"]
@@ -294,10 +293,8 @@
                 formData.append("opsScore", results ? results.OPS.toFixed(1) : "0.0");
                 formData.append("primaryConstraint", results ? results.primaryConstraint.name : "N/A");
                 
-                // The field that Netlify will send in the email:
                 formData.append("readableReport", reportString);
                 
-                // Keep the JSON blob as a backup
                 const dataPayload = {
                     onboarding,
                     domainScores: results ? results.domainAverages.map(d => ({ name: d.name, score: d.avg })) : [],
@@ -402,7 +399,7 @@
                                         <div className="relative">
                                             <select value={onboarding.industry} onChange={(e) => setOnboarding({...onboarding, industry: e.target.value})} className="w-full p-6 bg-[#F4FAFD] rounded-2xl font-bold text-[#0C3D52] outline-none border-2 border-transparent focus:border-[#23B5D3] appearance-none">
                                                 <option value="">Select Industry...</option>
-                                                {["Professional Services", "Healthcare / Clinical", "SaaS / Tech", "Construction / Trades", "Real Estate", "Manufacturing", "E-commerce", "Retail", "Hospitality", "Education", "Marketing Agency", "Finance / Insurance", "Non-Profit", "Consulting", "Other"].map(i => <option key={i} value={i}>{i}</option>)}
+                                                {["Professional Services", "Healthcare / Clinical", "Professional Care Services", "Wellness / Fitness", "SaaS / Tech", "Construction / Trades", "Real Estate", "Manufacturing", "E-commerce", "Retail", "Hospitality", "Education", "Marketing Agency", "Finance / Insurance", "Non-Profit", "Consulting", "Other"].map(i => <option key={i} value={i}>{i}</option>)}
                                             </select>
                                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-[#23B5D3]">
                                                 <Icons.ChevronLeft />
