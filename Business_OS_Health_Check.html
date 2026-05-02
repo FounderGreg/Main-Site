@@ -12,7 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- React & Babel CDNs (Required to run JSX in a single file) -->
+    <!-- React & Babel CDNs -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -55,13 +55,13 @@
     <script type="text/babel">
         const { useState, useMemo, useEffect } = React;
 
-        /** * PROSPAIRITY BUSINESS OS HEALTH CHECK - WEBPAGE v1.6
+        /** * PROSPAIRITY BUSINESS OS HEALTH CHECK - WEBPAGE v1.8
          * Status: DEPLOYMENT READY + MASTER LOCKED
-         * Updated: Added Professional Care & Wellness industries; Optimized Report layout
+         * DISCREPANCY AUDIT: v1.8 optimized via mapping and ternary logic.
          */
 
         const INDUSTRY_GROUPS = {
-            SERVICES: ["Professional Services", "SaaS / Tech", "Marketing Agency", "Finance / Insurance", "Non-Profit", "Consulting", "Education", "Professional Care Services", "Wellness / Fitness"],
+            SERVICES: ["Professional Services", "SaaS / Tech", "Marketing Agency", "Finance / Insurance", "Non-Profit", "Consulting", "Education", "Personal Care Services / Salons", "Wellness / Fitness"],
             CLINICAL: ["Healthcare / Clinical"],
             PHYSICAL: ["Construction / Trades", "Real Estate", "Manufacturing"],
             RETAIL: ["E-commerce", "Retail", "Hospitality", "Other"]
@@ -87,18 +87,21 @@
         const SCORE_VALUES = [0, 1, 2, 3, 5]; 
 
         const getAdaptiveDomains = (group) => {
+            const isServices = group === 'SERVICES';
+            const terms = { SERVICES: "client/member", CLINICAL: "patient", PHYSICAL: "customer", RETAIL: "customer" }[group] || "client";
+
             const banks = {
                 SERVICES: [
                     { id: 'D1', name: 'Revenue Engine & Demand Stability', weight: 1.3, questions: [
-                        { id: 'Q1', text: 'How predictable is your monthly recurring or project-based revenue?', options: ['Highly unpredictable', 'Mostly reactive', 'Somewhat predictable', 'Mostly stable', 'Highly predictable'] },
-                        { id: 'Q2', text: 'How clearly mapped is your client acquisition funnel from lead to signed contract?', options: ['Not defined', 'Loosely understood', 'Partially mapped', 'Clearly structured', 'Fully documented'] },
-                        { id: 'Q3', text: 'What percentage of your revenue comes from retained or repeat client accounts?', options: ['Very little', 'Some', 'About half', 'Mostly repeat', 'Strong repeat base'] },
+                        { id: 'Q1', text: 'How predictable is your monthly recurring revenue vs. new client/member revenue?', options: ['Highly unpredictable', 'Mostly reactive', 'Somewhat predictable', 'Mostly stable', 'Highly predictable'] },
+                        { id: 'Q2', text: 'How clearly mapped is your new-client/member acquisition funnel from Lead to Booked/Signed?', options: ['Not defined', 'Loosely understood', 'Partially mapped', 'Clearly structured', 'Fully documented'] },
+                        { id: 'Q3', text: 'What percentage of your monthly revenue comes from retained memberships or repeat clients?', options: ['Very little', 'Some', 'About half', 'Mostly repeat', 'Strong repeat base'] },
                         { id: 'Q4', text: 'If your primary lead source stopped today, how exposed would your revenue be?', options: ['Severe disruption', 'Significant disruption', 'Manageable strain', 'Minor impact', 'Minimal impact'] }
                     ]},
                     { id: 'D2', name: 'Process Standardization', weight: 1.3, questions: [
-                        { id: 'Q5', text: 'How consistently are client deliverables executed the same way every time?', options: ['Never consistent', 'Rarely consistent', 'Sometimes consistent', 'Often consistent', 'Always consistent'] },
+                        { id: 'Q5', text: 'How consistent is the new-client initiation or 1st time service(s) booking process?', options: ['Never consistent', 'Rarely consistent', 'Sometimes consistent', 'Often consistent', 'Always consistent'] },
                         { id: 'Q6', text: 'How dependent are project outcomes on your personal expertise vs. a team process?', options: ['Completely dependent', 'Mostly dependent', 'Partially dependent', 'Mostly process-driven', 'Fully process-driven'] },
-                        { id: 'Q7', text: 'How often does "Scope Creep" or rework happen due to unclear internal SOPs?', options: ['Very frequently', 'Frequently', 'Occasionally', 'Rarely', 'Almost never'] },
+                        { id: 'Q7', text: 'How often do unclear internal SOP\'s (Standard Operating Procedures) lead to New/Existing Clients or Members to Cancel?', options: ['Very frequently', 'Frequently', 'Occasionally', 'Rarely', 'Almost never'] },
                         { id: 'Q8', text: 'Are your core service workflows documented in an accessible Knowledge Base?', options: ['Not documented', 'Lightly documented', 'Partially followed', 'Mostly followed', 'Fully documented and used'] }
                     ]}
                 ],
@@ -146,47 +149,45 @@
                 ]
             };
 
-            const getUniversalDomains = (group) => {
-                const terms = { SERVICES: "client", CLINICAL: "patient", PHYSICAL: "customer", RETAIL: "customer" }[group] || "client";
-                return [
-                    { id: 'D3', name: 'Financial Visibility & Margin Control', weight: 1.3, questions: [
-                        { id: 'Q9', text: 'How clearly do you understand your true profit margins per job or service?', options: ['Not at all', 'Rough estimate', 'Some clarity', 'Clear understanding', 'Fully tracked'] },
-                        { id: 'Q10', text: 'How often do financial surprises (cash crunch, tax issues) occur?', options: ['Constantly', 'Frequently', 'Occasionally', 'Rarely', 'Almost never'] },
-                        { id: 'Q11', text: 'Are your monthly financial reports used to make active hiring or spending decisions?', options: ['Not connected', 'Loosely connected', 'Sometimes considered', 'Usually considered', 'Fully integrated'] },
-                        { id: 'Q12', text: 'Can you confidently forecast cash flow 60–90 days ahead?', options: ['Not at all', 'Barely', 'Somewhat', 'Mostly', 'Completely'] }
-                    ]},
-                    { id: 'D4', name: 'Decision & Accountability Clarity', weight: 1.2, questions: [
-                        { id: 'Q13', text: 'How clearly defined are decision rights across your leadership team?', options: ['Not clear', 'Somewhat unclear', 'Partially defined', 'Mostly clear', 'Fully defined'] },
-                        { id: 'Q14', text: 'How often do routine execution issues escalate to you unnecessarily?', options: ['Constantly', 'Frequently', 'Sometimes', 'Rarely', 'Almost never'] },
-                        { id: 'Q15', text: `How confident are team members in owning ${terms} outcomes without your input?`, options: ['Not confident', 'Low confidence', 'Moderate confidence', 'High confidence', 'Fully empowered'] }
-                    ]},
-                    { id: 'D5', name: `${group === 'CLINICAL' ? 'Patient' : 'Client'} Experience Consistency`, weight: 1.1, questions: [
-                        { id: 'Q16', text: `How consistent is the ${terms} experience from first contact to completion?`, options: ['Highly inconsistent', 'Often inconsistent', 'Sometimes consistent', 'Mostly consistent', 'Highly consistent'] },
-                        { id: 'Q17', text: `Is the ${terms} journey clearly designed or just "happening"?`, options: ['Accidental', 'Loosely understood', 'Partially structured', 'Mostly structured', 'Fully designed'] },
-                        { id: 'Q18', text: `How reliably do you collect feedback after ${terms} service is complete?`, options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always'] }
-                    ]},
-                    { id: 'D6', name: 'Operational Visibility', weight: 1.1, questions: [
-                        { id: 'Q19', text: 'How quickly can you assess the actual health of your daily operations?', options: ['Total fog', 'With significant effort', 'With some review', 'Quickly', 'Instantly at a glance'] },
-                        { id: 'Q20', text: 'How consistently are key performance metrics reviewed?', options: ['Never', 'Rarely', 'Occasionally', 'Often', 'Fixed rhythm'] },
-                        { id: 'Q21', text: 'How early are operational risks typically identified?', options: ['After damage', 'Late', 'Sometimes early', 'Often early', 'Proactively'] }
-                    ]},
-                    { id: 'D7', name: 'Leadership Load & Stability', weight: 1.2, questions: [
-                        { id: 'Q22', text: 'How much uninterrupted strategic time do you protect every week?', options: ['None', 'Very little', 'Some', 'Protected regularly', 'Strongly protected'] },
-                        { id: 'Q23', text: 'How often are you pulled back into routine execution issues?', options: ['Constantly', 'Frequently', 'Sometimes', 'Rarely', 'Almost never'] },
-                        { id: 'Q24', text: 'How comfortable are you stepping away from the business for 7 days?', options: ['Terrified', 'Very uncomfortable', 'Somewhat uncomfortable', 'Mostly comfortable', 'Fully comfortable'] },
-                        { id: 'Q25', text: 'How often do urgent issues override your strategic priorities?', options: ['Constantly', 'Frequently', 'Sometimes', 'Rarely', 'Almost never'] }
-                    ]},
-                    { id: 'D8', name: 'Systemization & Tool Alignment', weight: 1.0, questions: [
-                        { id: 'Q26', text: 'How aligned are your software tools with your actual workflows?', options: ['Friction-filled', 'Poorly aligned', 'Somewhat aligned', 'Mostly aligned', 'Fully aligned'] },
-                        { id: 'Q27', text: 'How much manual data duplication exists between your systems?', options: ['Extreme', 'Quite a bit', 'Some', 'Minimal', 'Almost none'] },
-                        { id: 'Q28', text: 'Does your automation support the process—or try to hide a broken one?', options: ['Mostly hiding flaws', 'Often hiding', 'Mixed', 'Mostly supporting', 'Fully supporting'] }
-                    ]}
-                ];
-            };
-            return [...(banks[group] || banks.SERVICES), ...getUniversalDomains(group)];
+            const universal = [
+                { id: 'D3', name: 'Financial Visibility & Margin Control', weight: 1.3, questions: [
+                    { id: 'Q9', text: isServices ? 'How clearly do you understand your true profit margins per membership or service?' : 'How clearly do you understand your true profit margins per job or service?', options: ['Not at all', 'Rough estimate', 'Some clarity', 'Clear understanding', 'Fully tracked'] },
+                    { id: 'Q10', text: 'How often do financial surprises (cash crunch, tax issues) occur?', options: ['Constantly', 'Frequently', 'Occasionally', 'Rarely', 'Almost never'] },
+                    { id: 'Q11', text: 'Are your monthly financial reports used to make active hiring or spending decisions?', options: ['Not connected', 'Loosely connected', 'Sometimes considered', 'Usually considered', 'Fully integrated'] },
+                    { id: 'Q12', text: isServices ? 'How confidently can you forecast cash flow 60–90 days ahead?' : 'Can you confidently forecast cash flow 60–90 days ahead?', options: ['Not at all', 'Barely', 'Somewhat', 'Mostly', 'Completely'] }
+                ]},
+                { id: 'D4', name: 'Decision & Accountability Clarity', weight: 1.2, questions: [
+                    { id: 'Q13', text: 'How clearly defined are decision rights across your leadership team?', options: ['Not clear', 'Somewhat unclear', 'Partially defined', 'Mostly clear', 'Fully defined'] },
+                    { id: 'Q14', text: isServices ? 'How often do routine issues or concerns escalate to you unnecessarily?' : 'How often do routine execution issues escalate to you unnecessarily?', options: ['Constantly', 'Frequently', 'Sometimes', 'Rarely', 'Almost never'] },
+                    { id: 'Q15', text: isServices ? 'How confident are team members, or sub-contractors, in owning client/member outcomes without your input?' : `How confident are team members in owning ${terms} outcomes without your input?`, options: ['Not confident', 'Low confidence', 'Moderate confidence', 'High confidence', 'Fully empowered'] },
+                    ...(isServices ? [{ id: 'Q15_b', text: 'How often does input from your employees and/or sub-contractors factor in when considering new SOP\'s?', options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always'] }] : [])
+                ]},
+                { id: 'D5', name: isServices ? 'Client/Member Experience Consistency' : `${group === 'CLINICAL' ? 'Patient' : 'Client'} Experience Consistency`, weight: 1.1, questions: [
+                    { id: 'Q16', text: isServices ? 'How consistent is the client/member experience from first contact to service or membership booked?' : `How consistent is the ${terms} experience from first contact to completion?`, options: ['Highly inconsistent', 'Often inconsistent', 'Sometimes consistent', 'Mostly consistent', 'Highly consistent'] },
+                    { id: 'Q17', text: isServices ? 'Is the client/member journey clearly structured, or just "happening" the majority of the time?' : `Is the ${terms} journey clearly designed or just "happening"?`, options: ['Accidental', 'Loosely understood', 'Partially structured', 'Mostly structured', 'Fully designed'] },
+                    { id: 'Q18', text: `How reliably do you collect feedback after ${terms} service is complete?`, options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always'] }
+                ]},
+                { id: 'D6', name: 'Operational Visibility', weight: 1.1, questions: [
+                    { id: 'Q19', text: 'How quickly can you assess the actual health of your daily operations?', options: ['Total fog', 'With significant effort', 'With some review', 'Quickly', 'Instantly at a glance'] },
+                    { id: 'Q20', text: 'How consistently are key performance metrics reviewed?', options: ['Never', 'Rarely', 'Occasionally', 'Often', 'Fixed rhythm'] },
+                    { id: 'Q21', text: 'How early are operational risks typically identified?', options: ['After damage', 'Late', 'Sometimes early', 'Often early', 'Proactively'] }
+                ]},
+                { id: 'D7', name: 'Leadership Load & Stability', weight: 1.2, questions: [
+                    { id: 'Q22', text: 'How much uninterrupted strategic time do you protect every week?', options: ['None', 'Very little', 'Some', 'Protected regularly', 'Strongly protected'] },
+                    { id: 'Q23', text: 'How often are you pulled back into routine execution issues?', options: ['Constantly', 'Frequently', 'Sometimes', 'Rarely', 'Almost never'] },
+                    { id: 'Q24', text: 'How comfortable are you stepping away from the business for 7 days?', options: ['Terrified', 'Very uncomfortable', 'Somewhat uncomfortable', 'Mostly comfortable', 'Fully comfortable'] },
+                    { id: 'Q25', text: 'How often do urgent issues override your strategic priorities?', options: ['Constantly', 'Frequently', 'Sometimes', 'Rarely', 'Almost never'] }
+                ]},
+                { id: 'D8', name: 'Systemization & Tool Alignment', weight: 1.0, questions: [
+                    { id: 'Q26', text: 'How aligned are your software tools with your actual workflows?', options: ['Friction-filled', 'Poorly aligned', 'Somewhat aligned', 'Mostly aligned', 'Fully aligned'] },
+                    { id: 'Q27', text: 'How much manual data duplication exists between your systems?', options: ['Extreme', 'Quite a bit', 'Some', 'Minimal', 'Almost none'] },
+                    { id: 'Q28', text: 'Does your automation support the process—or try to hide a broken one?', options: ['Mostly hiding flaws', 'Often hiding', 'Mixed', 'Mostly supporting', 'Fully supporting'] }
+                ]}
+            ];
+            return [...(banks[group] || banks.SERVICES), ...universal];
         };
 
-        const D9_CONTENT = {
+            const D9_CONTENT = {
             preamble: `Most business diagnostics ignore external strain. Data does not. Research consistently shows that small and mid-sized business instability is strongly correlated with owner bandwidth and decision fatigue. This section is confidential and optional. It does not change your structural score; it informs the pacing of our potential strategy.`,
             questions: [
                 { id: 'Q29', type: 'select', text: 'Over the past 12 months, have significant life events affected your business energy?', options: ['Yes', 'No', 'Prefer not to say'] },
@@ -206,7 +207,6 @@
             const [currentDomainIdx, setCurrentDomainIdx] = useState(0);
             const [isSubmitting, setIsSubmitting] = useState(false);
 
-            // AUTO-SCROLL TO TOP ON STAGE OR DOMAIN CHANGE
             useEffect(() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }, [stage, currentDomainIdx]);
@@ -246,7 +246,6 @@
             const handleUnifiedAction = async () => {
                 setIsSubmitting(true);
                 
-                // GENERATE READABLE REPORT FOR EMAIL NOTIFICATION
                 let reportString = `PROSPAIRITY BUSINESS OS HEALTH CHECK\n`;
                 reportString += `====================================\n`;
                 reportString += `CLIENT: ${onboarding.fullName}\n`;
@@ -274,14 +273,6 @@
                     });
                 });
 
-                if (Object.keys(d9Answers).length > 0) {
-                    reportString += `\n[CONFIDENTIAL STRAIN ANALYSIS]\n`;
-                    D9_CONTENT.questions.forEach(q => {
-                        reportString += `${q.text}: ${d9Answers[q.id] || 'Skipped'}\n`;
-                    });
-                }
-
-                // 1. Submit Data to Netlify
                 const formData = new FormData();
                 formData.append("form-name", "health-check-v1");
                 formData.append("fullName", onboarding.fullName);
@@ -292,15 +283,7 @@
                 formData.append("teamSize", onboarding.teamSize);
                 formData.append("opsScore", results ? results.OPS.toFixed(1) : "0.0");
                 formData.append("primaryConstraint", results ? results.primaryConstraint.name : "N/A");
-                
                 formData.append("readableReport", reportString);
-                
-                const dataPayload = {
-                    onboarding,
-                    domainScores: results ? results.domainAverages.map(d => ({ name: d.name, score: d.avg })) : [],
-                    d9Strain: d9Answers
-                };
-                formData.append("fullData", JSON.stringify(dataPayload, null, 2));
 
                 try {
                     await fetch("/", {
@@ -308,11 +291,7 @@
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: new URLSearchParams(formData).toString(),
                     });
-                    
-                    // 2. Trigger Print Dialog
                     window.print();
-                    
-                    // 3. Move to completion screen
                     setStage('submitted');
                 } catch (err) {
                     window.print(); 
@@ -399,7 +378,7 @@
                                         <div className="relative">
                                             <select value={onboarding.industry} onChange={(e) => setOnboarding({...onboarding, industry: e.target.value})} className="w-full p-6 bg-[#F4FAFD] rounded-2xl font-bold text-[#0C3D52] outline-none border-2 border-transparent focus:border-[#23B5D3] appearance-none">
                                                 <option value="">Select Industry...</option>
-                                                {["Professional Services", "Healthcare / Clinical", "Professional Care Services", "Wellness / Fitness", "SaaS / Tech", "Construction / Trades", "Real Estate", "Manufacturing", "E-commerce", "Retail", "Hospitality", "Education", "Marketing Agency", "Finance / Insurance", "Non-Profit", "Consulting", "Other"].map(i => <option key={i} value={i}>{i}</option>)}
+                                                {["Professional Services", "Healthcare / Clinical", "Personal Care Services / Salons", "Wellness / Fitness", "SaaS / Tech", "Construction / Trades", "Real Estate", "Manufacturing", "E-commerce", "Retail", "Hospitality", "Education", "Marketing Agency", "Finance / Insurance", "Non-Profit", "Consulting", "Other"].map(i => <option key={i} value={i}>{i}</option>)}
                                             </select>
                                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-[#23B5D3]">
                                                 <Icons.ChevronLeft />
